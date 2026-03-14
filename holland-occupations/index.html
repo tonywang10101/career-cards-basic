@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Holland 職業選擇 | 生涯諮詢工具</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/occupations.css">
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+
+    <div class="page-header">
+      <h2>Holland 職業選擇</h2>
+      <p>瀏覽職業卡片，選出最多 15 個喜歡的職業</p>
+    </div>
+
+    <!-- ===== MODE BAR ===== -->
+    <div class="mode-bar">
+      <button class="mode-btn active" id="mode-select-btn"
+              onclick="switchMode('select')">✏️ 選擇模式</button>
+      <button class="mode-btn" id="mode-display-btn"
+              onclick="switchMode('display')">📊 展示模式</button>
+      <div class="mode-spacer"></div>
+      <button class="btn btn-outline" onclick="resetAll()">🔄 重新開始</button>
+      <button class="btn btn-primary" onclick="shareResult()">🔗 分享結果</button>
+    </div>
+
+    <!-- ===== SELECT VIEW ===== -->
+    <div id="select-view">
+
+      <!-- Status bar: liked counter + evaluated progress -->
+      <div class="occ-status-bar">
+        <div class="occ-counter-badge" id="liked-counter">
+          <span class="badge-num">0</span> / 15 已選喜歡
+        </div>
+        <div class="occ-progress-wrap">
+          <div class="occ-progress-label" id="occ-progress-label">已評估 0 / 12 張</div>
+          <div class="occ-progress-bar-wrap">
+            <div class="occ-progress-bar-fill" id="occ-progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="occ-remaining-text" id="occ-remaining-text">還有 12 張未評估</div>
+      </div>
+
+      <!-- Cards carousel -->
+      <div class="cards-viewport" id="cardsViewport">
+        <div class="cards-track" id="cardsTrack"></div>
+      </div>
+
+      <!-- Carousel navigation -->
+      <div class="carousel-nav">
+        <button class="carousel-arrow" id="prev-btn"
+                onclick="prevCard()" disabled>‹</button>
+        <div class="carousel-dots" id="carousel-dots"></div>
+        <button class="carousel-arrow" id="next-btn"
+                onclick="nextCard()">›</button>
+      </div>
+
+      <!-- Liked chips strip -->
+      <div class="liked-strip">
+        <div class="liked-strip-header">
+          <span class="liked-strip-label">已選擇</span>
+          <span class="liked-strip-count" id="chips-count">0 / 15</span>
+        </div>
+        <div class="liked-chips" id="liked-chips">
+          <span class="liked-chips-empty">尚未選擇喜歡的職業</span>
+        </div>
+      </div>
+
+      <!-- All-done banner -->
+      <div id="occ-complete-banner" style="display:none;">
+        <div class="occ-complete">
+          <div class="check-icon">✅</div>
+          <h3>選擇完成！</h3>
+          <p>所有職業卡片已評估，可切換至展示模式查看結果。</p>
+          <button class="btn btn-primary"
+                  onclick="switchMode('display')">查看結果 →</button>
+        </div>
+      </div>
+
+    </div><!-- /select-view -->
+
+    <!-- ===== DISPLAY VIEW ===== -->
+    <div id="display-view" style="display:none;">
+      <div class="display-header-bar">
+        <h3>喜歡的職業</h3>
+        <span class="display-liked-count" id="display-liked-count">共 0 個職業</span>
+      </div>
+      <div class="display-cards-grid" id="display-grid"></div>
+    </div>
+
+  </main>
+</div><!-- /app-shell -->
+
+<div class="toast" id="toast"></div>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/occupations.js"></script>
+<script>
+  initNav('holland-occupations', '../');
+  initOccupations();
+</script>
+</body>
+</html>

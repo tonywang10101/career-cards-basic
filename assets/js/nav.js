@@ -11,13 +11,14 @@ const NAV_ITEMS = [
   {
     section: '首頁',
     items: [
-      { key: 'home', icon: '🏠', label: '工具總覽', href: '' }
+      { key: 'home', icon: '🏠', label: '工具總覽', href: 'index.html' }
     ]
   },
   {
     section: '測驗工具',
     items: [
-      { key: 'holland-basic', icon: '🎯', label: 'Holland Code 排序', href: 'holland-basic/' }
+      { key: 'holland-basic',       icon: '🎯', label: 'Holland Code 排序',   href: 'holland-basic/index.html' },
+      { key: 'holland-occupations', icon: '💼', label: 'Holland 職業選擇',     href: 'holland-occupations/index.html' }
     ]
   }
 ];

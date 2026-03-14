@@ -214,6 +214,7 @@
   justify-content: center;
   gap: 16px;
   margin-top: 20px;
+  margin-bottom: 100px;
 }
 
 .carousel-arrow {
@@ -345,4 +346,14 @@
 @media (max-width: 768px) {
   .display-card { width: calc(50% - 7px); }
   .rating-btn   { font-size: 12px; }
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: grey;
+  color: white;
+  text-align: center;
 }

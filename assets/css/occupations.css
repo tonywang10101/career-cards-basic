@@ -318,6 +318,7 @@
 /* ---- Liked chips strip ---- */
 .liked-strip {
   margin-top: 20px;
+  margin-bottom: 100px;
   background: white;
   border: 1px solid var(--gray-200);
   border-radius: var(--radius);
@@ -483,4 +484,15 @@
   .display-cards-grid {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
+}
+
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: grey;
+  color: white;
+  text-align: center;
 }

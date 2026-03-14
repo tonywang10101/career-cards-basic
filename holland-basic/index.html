@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Holland Code 排序 | 生涯諮詢工具</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/holland.css">
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+
+    <div class="page-header">
+      <h2>Holland Code 排序</h2>
+      <p>RIASEC 職業興趣類型測驗</p>
+    </div>
+
+    <!-- Mode bar -->
+    <div class="mode-bar">
+      <button class="mode-btn active" id="mode-sort-btn"
+              onclick="switchMode('sort')">✏️ 排序模式</button>
+      <button class="mode-btn" id="mode-display-btn"
+              onclick="switchMode('display')">📊 展示模式</button>
+      <div class="mode-spacer"></div>
+      <button class="btn btn-outline" onclick="resetAll()">🔄 重新開始</button>
+      <button class="btn btn-primary" onclick="shareResult()">🔗 分享結果</button>
+    </div>
+
+    <!-- ===== SORT VIEW ===== -->
+    <div id="sort-view">
+
+      <div class="sort-progress">
+        <span id="progress-text">0 / 6 張已評分</span>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="cards-viewport" id="cardsViewport">
+        <div class="cards-track" id="cardsTrack"></div>
+      </div>
+
+      <div class="carousel-nav">
+        <button class="carousel-arrow" id="prev-btn"
+                onclick="prevCard()" disabled>‹</button>
+        <div class="carousel-dots" id="carousel-dots"></div>
+        <button class="carousel-arrow" id="next-btn"
+                onclick="nextCard()">›</button>
+      </div>
+
+      <div id="sort-complete-banner" style="display:none;">
+        <div class="sort-complete">
+          <div class="check-icon">✅</div>
+          <h3>排序完成！</h3>
+          <p>所有卡片已評分，可切換至展示模式查看結果。</p>
+          <button class="btn btn-primary"
+                  onclick="switchMode('display')">查看結果 →</button>
+        </div>
+      </div>
+
+    </div><!-- /sort-view -->
+
+    <!-- ===== DISPLAY VIEW ===== -->
+    <div id="display-view" style="display:none;">
+      <div class="display-groups" id="display-groups"></div>
+    </div>
+
+  </main>
+</div><!-- /app-shell -->
+
+<div class="toast" id="toast"></div>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/holland.js"></script>
+<script>
+  initNav('holland-basic', '../');
+  initHolland();
+</script>
+</body>
+</html>

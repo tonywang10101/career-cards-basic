@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生涯諮詢工具</title>
+<style>
+  :root {
+    --primary: #4F46E5;
+    --primary-light: #EEF2FF;
+    --primary-dark: #3730A3;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --radius: 12px;
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Noto Sans TC', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    min-height: 100vh;
+  }
+
+  /* ===== LAYOUT ===== */
+  .app-shell {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 240px;
+    background: white;
+    border-right: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .sidebar-logo h1 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.3;
+  }
+
+  .sidebar-logo p {
+    font-size: 11px;
+    color: var(--gray-400);
+    margin-top: 2px;
+  }
+
+  .sidebar-nav {
+    padding: 12px 12px;
+    flex: 1;
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    padding: 8px 8px 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--gray-600);
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .nav-item:hover {
+    background: var(--gray-100);
+    color: var(--gray-800);
+  }
+
+  .nav-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .nav-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  .main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 40px;
+  }
+
+  /* ===== PAGE HEADER ===== */
+  .page-header {
+    margin-bottom: 28px;
+  }
+
+  .page-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gray-800);
+  }
+
+  .page-header p {
+    font-size: 14px;
+    color: var(--gray-400);
+    margin-top: 4px;
+  }
+
+  /* ===== HOME PAGE ===== */
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 8px;
+  }
+
+  .tool-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+
+  .tool-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+  }
+
+  .tool-card-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .tool-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .tool-card p {
+    font-size: 13px;
+    color: var(--gray-400);
+    line-height: 1.5;
+  }
+
+  /* ===== PAGE VIEWS ===== */
+  .page-view { display: none; }
+  .page-view.active { display: block; }
+
+  /* ===== MODE SWITCHER ===== */
+  .mode-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .mode-btn {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 2px solid var(--gray-200);
+    background: white;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .mode-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+  .mode-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+
+  .mode-spacer { flex: 1; }
+
+  /* ===== SORT VIEW ===== */
+  .sort-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--gray-400);
+  }
+
+  .progress-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  /* Cards carousel */
+  .cards-viewport {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+  }
+
+  .cards-track {
+    display: flex;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    will-change: transform;
+    touch-action: pan-y;
+  }
+
+  .riasec-card {
+    flex: 0 0 calc(100% / var(--visible, 1));
+    max-width: calc(100% / var(--visible, 1));
+    padding: 0 12px;
+  }
+
+  .card-inner {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+
+  .card-inner:hover { box-shadow: var(--shadow-lg); }
+
+  .card-header {
+    padding: 20px 22px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .card-code-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .card-titles { flex: 1; }
+
+  .card-en {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gray-800);
+  }
+
+  .card-zh {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-top: 1px;
+  }
+
+  .card-desc {
+    padding: 0 22px 16px;
+    font-size: 13px;
+    color: var(--gray-600);
+    line-height: 1.7;
+  }
+
+  .card-strengths {
+    margin: 10px 22px 16px;
+    padding: 12px 14px;
+    background: var(--gray-50);
+    border-radius: 8px;
+  }
+
+  .card-strengths-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-400);
+    margin-bottom: 6px;
+  }
+
+  .card-strengths ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .card-strengths li {
+    font-size: 12px;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-strengths li::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .card-careers {
+    padding: 0 22px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .career-tag {
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+
+  /* Rating buttons */
+  .rating-row {
+    display: flex;
+    gap: 10px;
+    padding: 14px 22px 20px;
+    border-top: 1px solid var(--gray-100);
+    justify-content: center;
+  }
+
+  .rating-btn {
+    flex: 1;
+    padding: 10px 6px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .rating-btn .btn-icon { font-size: 18px; }
+
+  .rating-btn.similar {
+    background: #ECFDF5;
+    color: #065F46;
+    border-color: #6EE7B7;
+  }
+
+  .rating-btn.similar:hover, .rating-btn.similar.selected {
+    background: #10B981;
+    color: white;
+    border-color: #10B981;
+    transform: scale(1.03);
+  }
+
+  .rating-btn.neutral {
+    background: #FFFBEB;
+    color: #92400E;
+    border-color: #FCD34D;
+  }
+
+  .rating-btn.neutral:hover, .rating-btn.neutral.selected {
+    background: #F59E0B;
+    color: white;
+    border-color: #F59E0B;
+    transform: scale(1.03);
+  }
+
+  .rating-btn.different {
+    background: #FEF2F2;
+    color: #991B1B;
+    border-color: #FCA5A5;
+  }
+
+  .rating-btn.different:hover, .rating-btn.different.selected {
+    background: #EF4444;
+    color: white;
+    border-color: #EF4444;
+    transform: scale(1.03);
+  }
+
+  /* Carousel nav */
+  .carousel-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .carousel-arrow {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid var(--gray-200);
+    background: white;
+    color: var(--gray-600);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .carousel-arrow:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .carousel-arrow:disabled { opacity: 0.3; cursor: default; }
+
+  .carousel-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gray-300);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .carousel-dot.active {
+    background: var(--primary);
+    width: 22px;
+    border-radius: 4px;
+  }
+
+  /* Sort complete banner */
+  .sort-complete {
+    text-align: center;
+    padding: 40px 20px;
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow);
+  }
+
+  .sort-complete .check-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+
+  .sort-complete h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .sort-complete p {
+    color: var(--gray-400);
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  /* ===== DISPLAY VIEW ===== */
+  .display-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .display-group {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .display-group-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .display-group-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .display-group-title {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .display-group-count {
+    font-size: 12px;
+    color: var(--gray-400);
+    background: var(--gray-100);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .display-cards-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px 20px;
+  }
+
+  .display-card {
+    flex: 0 0 auto;
+    width: 200px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 14px;
+  }
+
+  .display-card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .display-card-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .display-card-name {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .display-card-zh {
+    font-size: 11px;
+    color: var(--gray-400);
+  }
+
+  .display-empty {
+    padding: 20px;
+    color: var(--gray-300);
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  /* ===== ACTION BAR ===== */
+  .action-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .btn-primary:hover { background: var(--primary-dark); }
+
+  .btn-outline {
+    background: white;
+    border: 2px solid var(--gray-200);
+    color: var(--gray-700);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--gray-600);
+    border: none;
+  }
+
+  .btn-ghost:hover { background: var(--gray-100); }
+
+  /* Share toast */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--gray-800);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Color themes per code */
+  .code-R { --card-color: #F97316; --card-bg: #FFF7ED; }
+  .code-I { --card-color: #6366F1; --card-bg: #EEF2FF; }
+  .code-A { --card-color: #EC4899; --card-bg: #FDF2F8; }
+  .code-S { --card-color: #10B981; --card-bg: #ECFDF5; }
+  .code-E { --card-color: #EAB308; --card-bg: #FEFCE8; }
+  .code-C { --card-color: #0EA5E9; --card-bg: #F0F9FF; }
+
+  /* Mobile hamburger */
+  .hamburger {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 200;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: white;
+    border: 1px solid var(--gray-200);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 99;
+  }
+
+  @media (max-width: 768px) {
+    .hamburger { display: flex; }
+    .sidebar-overlay.open { display: block; }
+
+    .sidebar {
+      position: fixed;
+      left: -260px;
+      top: 0;
+      z-index: 100;
+      transition: left 0.3s;
+      height: 100vh;
+    }
+
+    .sidebar.open { left: 0; }
+
+    .main-content {
+      padding: 20px 16px;
+      padding-top: 60px;
+    }
+
+    .riasec-card {
+      flex: 0 0 100%;
+      max-width: 100%;
+      padding: 0;
+    }
+
+    .display-card { width: 160px; }
+  }
+
+  @media (min-width: 769px) and (max-width: 1100px) {
+    .main-content { padding: 28px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <h1>生涯諮詢工具</h1>
+      <p>Career Counseling Tools</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">首頁</div>
+      <div class="nav-item active" id="nav-home" onclick="showPage('home')">
+        <span class="nav-icon">🏠</span> 工具總覽
+      </div>
+      <div class="nav-section-label" style="margin-top:12px">測驗工具</div>
+      <div class="nav-item" id="nav-riasec" onclick="showPage('riasec')">
+        <span class="nav-icon">🎯</span> Holland Code 排序
+      </div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- HOME -->
+    <div class="page-view active" id="page-home">
+      <div class="page-header">
+        <h2>工具總覽</h2>
+        <p>選擇下方工具開始使用</p>
+      </div>
+      <div class="home-grid">
+        <div class="tool-card" onclick="showPage('riasec')">
+          <div class="tool-card-icon">🎯</div>
+          <h3>Holland Code 排序</h3>
+          <p>透過 RIASEC 六種類型卡片，快速排序出個案的職涯興趣類型。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIASEC PAGE -->
+    <div class="page-view" id="page-riasec">
+      <div class="page-header">
+        <h2>Holland Code 排序</h2>
+        <p>RIASEC 職業興趣類型測驗</p>
+      </div>
+
+      <div class="mode-bar">
+        <button class="mode-btn active" id="mode-sort-btn" onclick="switchMode('sort')">✏️ 排序模式</button>
+        <button class="mode-btn" id="mode-display-btn" onclick="switchMode('display')">📊 展示模式</button>
+        <div class="mode-spacer"></div>
+        <button class="btn btn-outline" onclick="resetAll()">🔄 重新開始</button>
+        <button class="btn btn-primary" onclick="shareResult()">🔗 分享結果</button>
+      </div>
+
+      <!-- SORT MODE -->
+      <div id="sort-view">
+        <div class="sort-progress">
+          <span id="progress-text">0 / 6 張已評分</span>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="cards-viewport" id="cardsViewport">
+          <div class="cards-track" id="cardsTrack"></div>
+        </div>
+
+        <div class="carousel-nav">
+          <button class="carousel-arrow" id="prev-btn" onclick="prevCard()" disabled>‹</button>
+          <div class="carousel-dots" id="carousel-dots"></div>
+          <button class="carousel-arrow" id="next-btn" onclick="nextCard()">›</button>
+        </div>
+
+        <div id="sort-complete-banner" style="display:none; margin-top: 24px;">
+          <div class="sort-complete">
+            <div class="check-icon">✅</div>
+            <h3>排序完成！</h3>
+            <p>所有卡片已評分，可切換至展示模式查看結果。</p>
+            <button class="btn btn-primary" onclick="switchMode('display')">查看結果 →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DISPLAY MODE -->
+      <div id="display-view" style="display:none;">
+        <div class="display-groups" id="display-groups"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const CARDS = [
+  {
+    code: "R",
+    english: "Realistic",
+    chinese: "實踐者",
+    description: "實踐者注重實際行動，常獨自完成任務，喜歡機械或可操作的工具，喜歡戶外活動、肢體運動和各種冒險探索。面對問題時，比起討論或空想，更喜歡直接嘗試。在生涯選擇上，喜歡能產生具體作品或成果的工作。",
+    strengths: ["機械與設備操作", "對工具運用、設備操作有天賦", "廚藝手工", "畜養動物"],
+    careers: ["機械電子", "農林漁牧", "運動", "建築工藝領域"]
+  },
+  {
+    code: "I",
+    english: "Investigative",
+    chinese: "思考者",
+    description: "思考者好奇心強，喜歡分析、思考與解決複雜問題。擅長觀察、構想、搜尋真理並提出各種假設。常接觸人文科學或科技領域的資訊，在資料分析與理論建構方面，是不可多得的人才。在生涯選擇上，喜歡需要思考與研究的專業工作。",
+    strengths: ["理解、解決科學或數學問題", "研究分析與解釋資料", "構想與理論", "抽象思考"],
+    careers: ["理工生醫", "人文科學領域"]
+  },
+  {
+    code: "A",
+    english: "Artistic",
+    chinese: "創造者",
+    description: "創造者充滿創意與想像力，總是有很多新穎的想法，喜歡設計、戲劇、文學、舞蹈、音樂等活動，具有強大的直覺與靈感，對美的追求更勝於科學。在生涯選擇上，喜歡待在充滿變化與挑戰的環境，讓自己的獨特性能充分發揮。",
+    strengths: ["運用想像力與創造力產生靈感", "做事創新、彈性而靈活", "喜於設計與創造", "具有文藝天賦"],
+    careers: ["藝術", "設計等領域"]
+  },
+  {
+    code: "S",
+    english: "Social",
+    chinese: "助人者",
+    description: "助人者個性友善且極具包容力，喜歡和人互動與幫助他人，關懷社會、生命或周遭的人群，經常教導、協助、照顧別人，解決他人的困難，懂得傾聽和溝通，擅長解決人際衝突。在生涯選擇上，適合與人互動、協助他人和教導培訓等工作。",
+    strengths: ["協調人際活動", "發現與解決他人問題", "優秀的人際與情緒管理能力"],
+    careers: ["教育", "社工心理", "醫護", "宗教等領域"]
+  },
+  {
+    code: "E",
+    english: "Enterprising",
+    chinese: "影響者",
+    description: "影響者自信果敢且充滿精力，勇於競爭與冒險，喜歡商業活動與決策。善用自己的資源和能力影響或說服別人，讓別人買回自己提出的想法或執行方式。適合當企業家，或在團隊中擔任並發起計劃的角色。在生涯選擇上，會追求經營地位較高的工作。",
+    strengths: ["能找出商業或獲利機會", "適合管理與監督工作", "具有銷售與說服技巧的潛力"],
+    careers: ["企業領導", "行銷企劃", "法律政治等領域"]
+  },
+  {
+    code: "C",
+    english: "Conventional",
+    chinese: "組織者",
+    description: "組織者喜歡有系統、組織化效率的 SOP 工作方式，無法接受混亂、沒有秩序的環境，在乎事情的精確細節並一絲不苟。在生涯選擇上，偏好規則清楚且明確的環境，善於透過行政處理讓事情順利運轉。",
+    strengths: ["善於數字運算", "資訊處理", "組織、規劃與統整", "文書、行政方面具精確的處理技巧"],
+    careers: ["財務金融", "特助秘書", "會計", "行政等領域"]
+  }
+];
+
+const CODE_COLORS = {
+  R: { color: '#F97316', bg: '#FFF7ED' },
+  I: { color: '#6366F1', bg: '#EEF2FF' },
+  A: { color: '#EC4899', bg: '#FDF2F8' },
+  S: { color: '#10B981', bg: '#ECFDF5' },
+  E: { color: '#EAB308', bg: '#FEFCE8' },
+  C: { color: '#0EA5E9', bg: '#F0F9FF' }
+};
+
+const GROUPS = ['相似', '普通', '不像'];
+const GROUP_COLORS = { '相似': '#10B981', '普通': '#F59E0B', '不像': '#EF4444' };
+
+// ===== STATE =====
+let ratings = {}; // code -> '相似' | '普通' | '不像'
+let currentIndex = 0;
+
+// ===== INIT =====
+function init() {
+  // Check URL params
+  const params = new URLSearchParams(window.location.search);
+  const encoded = params.get('r');
+  if (encoded) {
+    try {
+      const decoded = JSON.parse(atob(encoded));
+      ratings = decoded;
+      showPage('riasec');
+      switchMode('display');
+      return;
+    } catch(e) {}
+  }
+  renderCards();
+  renderDots();
+  updateProgress();
+}
+
+// ===== NAVIGATION =====
+function showPage(page) {
+  document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+  if (page === 'riasec') {
+    renderCards();
+    renderDots();
+    updateProgress();
+  }
+  // close sidebar on mobile
+  closeSidebar();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ===== MODE =====
+function switchMode(mode) {
+  if (mode === 'sort') {
+    document.getElementById('sort-view').style.display = '';
+    document.getElementById('display-view').style.display = 'none';
+    document.getElementById('mode-sort-btn').classList.add('active');
+    document.getElementById('mode-display-btn').classList.remove('active');
+  } else {
+    document.getElementById('sort-view').style.display = 'none';
+    document.getElementById('display-view').style.display = '';
+    document.getElementById('mode-sort-btn').classList.remove('active');
+    document.getElementById('mode-display-btn').classList.add('active');
+    renderDisplay();
+  }
+}
+
+// ===== CARDS =====
+function renderCards() {
+  const track = document.getElementById('cardsTrack');
+  track.innerHTML = '';
+
+  CARDS.forEach((card, i) => {
+    const c = CODE_COLORS[card.code];
+    const currentRating = ratings[card.code];
+
+    const el = document.createElement('div');
+    el.className = 'riasec-card';
+    el.id = 'card-' + i;
+    el.innerHTML = `
+      <div class="card-inner">
+        <div class="card-header">
+          <div class="card-code-badge" style="background:${c.bg}; color:${c.color}">${card.code}</div>
+          <div class="card-titles">
+            <div class="card-en">${card.english}</div>
+            <div class="card-zh">${card.chinese}</div>
+          </div>
+        </div>
+        <div class="card-desc">${card.description}</div>
+        <div class="card-strengths">
+          <div class="card-strengths-label">優勢特質</div>
+          <ul>${card.strengths.map(s => `<li>${s}</li>`).join('')}</ul>
+        </div>
+        <div class="card-careers">
+          ${card.careers.map(c2 => `<span class="career-tag">${c2}</span>`).join('')}
+        </div>
+        <div class="rating-row">
+          <button class="rating-btn similar ${currentRating === '相似' ? 'selected' : ''}"
+            onclick="rate('${card.code}', '相似', ${i})">
+            <span class="btn-icon">😊</span>相似
+          </button>
+          <button class="rating-btn neutral ${currentRating === '普通' ? 'selected' : ''}"
+            onclick="rate('${card.code}', '普通', ${i})">
+            <span class="btn-icon">😐</span>普通
+          </button>
+          <button class="rating-btn different ${currentRating === '不像' ? 'selected' : ''}"
+            onclick="rate('${card.code}', '不像', ${i})">
+            <span class="btn-icon">😶</span>不像
+          </button>
+        </div>
+      </div>`;
+    track.appendChild(el);
+  });
+
+  updateCarouselPosition();
+  updateArrows();
+}
+
+function renderDots() {
+  const dotsEl = document.getElementById('carousel-dots');
+  dotsEl.innerHTML = '';
+  CARDS.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'carousel-dot' + (i === currentIndex ? ' active' : '');
+    dot.onclick = () => goToCard(i);
+    dotsEl.appendChild(dot);
+  });
+}
+
+function goToCard(i) {
+  currentIndex = Math.max(0, Math.min(i, CARDS.length - 1));
+  updateCarouselPosition();
+  updateArrows();
+  updateDots();
+}
+
+function prevCard() { goToCard(currentIndex - 1); }
+function nextCard() { goToCard(currentIndex + 1); }
+
+function updateCarouselPosition() {
+  const track = document.getElementById('cardsTrack');
+  track.style.transform = `translateX(-${currentIndex * 100}%)`;
+}
+
+function updateArrows() {
+  document.getElementById('prev-btn').disabled = currentIndex === 0;
+  document.getElementById('next-btn').disabled = currentIndex === CARDS.length - 1;
+}
+
+function updateDots() {
+  document.querySelectorAll('.carousel-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === currentIndex);
+  });
+}
+
+// ===== RATING =====
+function rate(code, group, cardIndex) {
+  ratings[code] = group;
+  updateProgress();
+
+  // Re-render that card's buttons
+  const card = CARDS[cardIndex];
+  const row = document.querySelector(`#card-${cardIndex} .rating-row`);
+  if (row) {
+    row.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('selected'));
+    const map = { '相似': 'similar', '普通': 'neutral', '不像': 'different' };
+    const sel = row.querySelector('.' + map[group]);
+    if (sel) sel.classList.add('selected');
+  }
+
+  // Auto-advance after short delay if not last card
+  const ratedCount = Object.keys(ratings).length;
+  if (ratedCount < CARDS.length && cardIndex < CARDS.length - 1) {
+    setTimeout(() => goToCard(cardIndex + 1), 300);
+  }
+
+  // Show complete banner if all done
+  if (ratedCount === CARDS.length) {
+    document.getElementById('sort-complete-banner').style.display = '';
+  }
+}
+
+function updateProgress() {
+  const count = Object.keys(ratings).length;
+  document.getElementById('progress-text').textContent = `${count} / ${CARDS.length} 張已評分`;
+  document.getElementById('progress-fill').style.width = `${(count / CARDS.length) * 100}%`;
+}
+
+// ===== DISPLAY =====
+function renderDisplay() {
+  const container = document.getElementById('display-groups');
+  container.innerHTML = '';
+
+  GROUPS.forEach(group => {
+    const groupCards = CARDS.filter(c => ratings[c.code] === group);
+    const color = GROUP_COLORS[group];
+
+    const section = document.createElement('div');
+    section.className = 'display-group';
+    section.innerHTML = `
+      <div class="display-group-header">
+        <div class="display-group-dot" style="background:${color}"></div>
+        <div class="display-group-title" style="color:${color}">${group}</div>
+        <div class="display-group-count">${groupCards.length} 張</div>
+      </div>
+      <div class="display-cards-row" id="dg-${group}"></div>`;
+
+    container.appendChild(section);
+
+    const row = section.querySelector(`#dg-${group}`);
+    if (groupCards.length === 0) {
+      row.innerHTML = `<div class="display-empty">尚未分類任何卡片</div>`;
+    } else {
+      groupCards.forEach(card => {
+        const c = CODE_COLORS[card.code];
+        const el = document.createElement('div');
+        el.className = 'display-card';
+        el.innerHTML = `
+          <div class="display-card-top">
+            <div class="display-card-badge" style="background:${c.bg}; color:${c.color}">${card.code}</div>
+            <div>
+              <div class="display-card-name">${card.english}</div>
+              <div class="display-card-zh">${card.chinese}</div>
+            </div>
+          </div>`;
+        row.appendChild(el);
+      });
+    }
+  });
+}
+
+// ===== SHARE =====
+function shareResult() {
+  if (Object.keys(ratings).length === 0) {
+    showToast('請先完成排序再分享！');
+    return;
+  }
+  const encoded = btoa(JSON.stringify(ratings));
+  const url = `${location.origin}${location.pathname}?r=${encoded}`;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('✅ 連結已複製到剪貼簿！');
+  }).catch(() => {
+    prompt('複製此連結：', url);
+  });
+}
+
+// ===== RESET =====
+function resetAll() {
+  if (!confirm('確定要重新開始嗎？目前評分將會清除。')) return;
+  ratings = {};
+  currentIndex = 0;
+  document.getElementById('sort-complete-banner').style.display = 'none';
+  // Remove URL param
+  history.replaceState({}, '', location.pathname);
+  renderCards();
+  renderDots();
+  updateProgress();
+  switchMode('sort');
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== TOUCH/SWIPE =====
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.getElementById('cardsViewport').addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.getElementById('cardsViewport').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+    if (dx < 0) nextCard();
+    else prevCard();
+  }
+}, { passive: true });
+
+// ===== BOOT =====
+init();
+</script>
+</body>
+</html>

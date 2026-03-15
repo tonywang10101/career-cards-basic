@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QTVW5DBYY2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QTVW5DBYY2');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>職能盤點 – 生涯諮詢工具</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/inventory.css">
+  <link rel="stylesheet" href="../assets/css/occupations.css"><!-- reuse input-slot styles -->
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header">
+      <h2>職能盤點</h2>
+      <p>從 60 張職能卡片中，選出 7 個相對強勢與 7 個相對劣勢的職能。</p>
+    </div>
+
+    <!-- ===== MODE BAR ===== -->
+    <div class="mode-bar">
+      <button class="mode-btn active" id="mode-select-btn"
+              onclick="switchMode('select')">✏️ 選擇模式</button>
+      <button class="mode-btn" id="mode-display-btn"
+              onclick="switchMode('display')">📊 展示模式</button>
+      <button class="mode-btn" id="mode-input-btn"
+              onclick="switchMode('input')">📋 快速輸入</button>
+      <div class="mode-spacer"></div>
+      <button class="btn btn-outline" onclick="resetAll()">🔄 重新開始</button>
+      <button class="btn btn-primary" onclick="shareResult()">🔗 分享結果</button>
+    </div>
+
+    <!-- ===== SELECT VIEW ===== -->
+    <div id="inv-select-view">
+
+      <!-- Status bar -->
+      <div class="inv-status-bar">
+        <div class="inv-counter-badge" id="inv-strength-counter">
+          <span class="badge-num">0</span> / 7 強勢
+        </div>
+        <div class="inv-counter-badge" id="inv-weakness-counter">
+          <span class="badge-num badge-weak">0</span> / 7 劣勢
+        </div>
+        <div class="inv-progress-wrap">
+          <div class="inv-progress-bar">
+            <div class="inv-progress-fill" id="inv-progress-fill"></div>
+          </div>
+          <div class="inv-progress-label" id="inv-progress-label">已評估 0 / 60 張</div>
+        </div>
+        <div class="inv-remaining-text" id="inv-remaining-text">還有 60 張未評估</div>
+      </div>
+
+      <!-- Complete banner -->
+      <div class="inv-complete-banner" id="inv-complete-banner">
+        <h3>🎉 所有卡片評估完畢！</h3>
+        <p>切換到「展示模式」查看結果，或點「分享結果」產生連結。</p>
+      </div>
+
+      <!-- Carousel -->
+      <div class="inv-carousel-wrap">
+        <div class="inv-cards-viewport" id="inv-cards-viewport">
+          <div class="inv-cards-track" id="inv-cards-track">
+            <!-- cards injected by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Carousel nav -->
+      <div class="inv-carousel-nav">
+        <button class="inv-arrow-btn" id="inv-prev-btn" onclick="prevCard()">◀</button>
+        <div class="inv-dots-wrap" id="inv-carousel-dots"></div>
+        <button class="inv-arrow-btn" id="inv-next-btn" onclick="nextCard()">▶</button>
+      </div>
+
+      <!-- Chip strips -->
+      <div class="inv-chips-section">
+
+        <!-- Strength strip -->
+        <div class="inv-chip-row">
+          <span class="inv-chip-label strength-label">💪 強勢</span>
+          <div class="inv-chips-container" id="inv-strength-chips">
+            <span class="inv-chips-empty">尚未選擇</span>
+          </div>
+          <span class="inv-chip-count" id="inv-chips-str-count">0 / 7</span>
+        </div>
+
+        <!-- Weakness strip -->
+        <div class="inv-chip-row">
+          <span class="inv-chip-label weakness-label">🌱 劣勢</span>
+          <div class="inv-chips-container" id="inv-weakness-chips">
+            <span class="inv-chips-empty">尚未選擇</span>
+          </div>
+          <span class="inv-chip-count" id="inv-chips-weak-count">0 / 7</span>
+        </div>
+
+      </div>
+
+    </div><!-- /inv-select-view -->
+
+    <!-- ===== INPUT VIEW ===== -->
+    <div id="inv-input-view" style="display:none;">
+      <div class="inv-input-panel">
+
+        <div class="inv-input-panel-intro">
+          <strong>諮詢師快速輸入工具：</strong>
+          請輸入最多各 7 個職能的編號（參考選擇模式中卡片右上角的 # 編號），系統將自動驗證並產生分享連結。
+        </div>
+
+        <!-- Strength inputs -->
+        <div class="inv-input-section">
+          <div class="inv-input-section-head strength-head">
+            <span>💪</span>
+            <span class="inv-input-section-title">強勢職能（最多 7 個）</span>
+          </div>
+          <div class="inv-input-slots-wrap">
+            <div class="input-slots-grid" id="inv-input-strength-grid">
+              <!-- slots injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Weakness inputs -->
+        <div class="inv-input-section">
+          <div class="inv-input-section-head weakness-head">
+            <span>🌱</span>
+            <span class="inv-input-section-title">劣勢職能（最多 7 個）</span>
+          </div>
+          <div class="inv-input-slots-wrap">
+            <div class="input-slots-grid" id="inv-input-weakness-grid">
+              <!-- slots injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="input-actions">
+          <button class="btn btn-primary" onclick="generateInputURL()">🔗 產生連結</button>
+          <button class="btn btn-outline" onclick="clearInputPanel()">✕ 清除</button>
+          <span class="input-error-summary" id="inv-input-error-summary"></span>
+        </div>
+
+        <div class="input-result-box" id="inv-input-result-box">
+          <div class="input-result-label">已產生的分享連結</div>
+          <div class="input-result-url" id="inv-input-result-url"></div>
+          <div class="input-result-names" id="inv-input-result-names"></div>
+          <button class="btn btn-primary" onclick="copyInputURL()">📋 複製連結</button>
+        </div>
+
+      </div>
+    </div><!-- /inv-input-view -->
+
+    <!-- ===== DISPLAY VIEW ===== -->
+    <div id="inv-display-view" style="display:none;">
+
+      <!-- Strength section -->
+      <div class="inv-display-section">
+        <div class="inv-display-section-head strength-head">
+          <span class="inv-display-section-icon">💪</span>
+          <span class="inv-display-section-title">強勢職能</span>
+          <span class="inv-display-section-count" id="inv-display-str-count">共 0 項</span>
+        </div>
+        <div class="inv-display-cards-grid" id="inv-display-strength-grid">
+          <!-- cards injected by JS -->
+        </div>
+      </div>
+
+      <!-- Weakness section -->
+      <div class="inv-display-section">
+        <div class="inv-display-section-head weakness-head">
+          <span class="inv-display-section-icon">🌱</span>
+          <span class="inv-display-section-title">劣勢職能</span>
+          <span class="inv-display-section-count" id="inv-display-weak-count">共 0 項</span>
+        </div>
+        <div class="inv-display-cards-grid" id="inv-display-weakness-grid">
+          <!-- cards injected by JS -->
+        </div>
+      </div>
+
+    </div><!-- /inv-display-view -->
+
+  </main>
+</div><!-- /app-shell -->
+
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+  © 2026 Career Counseling Tools · <a href="https://github.com" style="color:inherit">GitHub</a> · MIT License
+</footer>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/inventory.js"></script>
+<script>
+  initNav('inventory', '../');
+  initInventory();
+</script>
+</body>
+</html>

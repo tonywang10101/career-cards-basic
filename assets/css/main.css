@@ -250,6 +250,17 @@ body {
   z-index: 99;
 }
 
+/* ===== FOOTER ===== */
+.footer {
+  border-top: 1px solid var(--gray-200);
+  background: white;
+  padding: 14px 40px;
+  font-size: 11px;
+  color: var(--gray-400);
+  line-height: 1.6;
+  text-align: center;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .hamburger { display: flex; }
@@ -269,6 +280,8 @@ body {
     padding: 20px 16px;
     padding-top: 60px;
   }
+
+  .footer { padding: 14px 16px; }
 }
 
 @media (min-width: 769px) and (max-width: 1100px) {

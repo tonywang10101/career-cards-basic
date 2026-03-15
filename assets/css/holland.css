@@ -214,7 +214,7 @@
   justify-content: center;
   gap: 16px;
   margin-top: 20px;
-  margin-bottom: 100px;
+  margin-bottom: 32px;
 }
 
 .carousel-arrow {
@@ -348,12 +348,4 @@
   .rating-btn   { font-size: 12px; }
 }
 
-.footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  background-color: grey;
-  color: white;
-  text-align: center;
-}
+/* Footer styles live in main.css */

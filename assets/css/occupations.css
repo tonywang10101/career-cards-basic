@@ -173,6 +173,19 @@
   margin-top: 3px;
 }
 
+.occ-id-badge {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-400);
+  background: var(--gray-100);
+  border-radius: 4px;
+  padding: 1px 5px;
+  vertical-align: middle;
+  letter-spacing: .02em;
+}
+
 /* Card body */
 .occ-card-desc {
   padding: 0 22px 14px;
@@ -318,7 +331,7 @@
 /* ---- Liked chips strip ---- */
 .liked-strip {
   margin-top: 20px;
-  margin-bottom: 100px;
+  margin-bottom: 32px;
   background: white;
   border: 1px solid var(--gray-200);
   border-radius: var(--radius);
@@ -487,12 +500,130 @@
 }
 
 
-.footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  background-color: grey;
-  color: white;
-  text-align: center;
+/* ---- Quick-input panel ---- */
+.input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
+
+.input-panel-intro {
+  background: var(--primary-light);
+  border: 1px solid #C7D2FE;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-size: 13px;
+  color: #3730A3;
+  line-height: 1.6;
+}
+
+.input-panel-intro strong { font-weight: 700; }
+
+.input-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.input-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.input-slot-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-400);
+  letter-spacing: .04em;
+}
+
+.input-slot-field {
+  width: 100%;
+  padding: 9px 10px;
+  border: 2px solid var(--gray-200);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-800);
+  background: white;
+  transition: border-color .15s;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.input-slot-field::-webkit-inner-spin-button,
+.input-slot-field::-webkit-outer-spin-button { -webkit-appearance: none; }
+.input-slot-field:focus { border-color: var(--primary); }
+.input-slot-field.is-valid   { border-color: #10B981; background: #F0FDF4; }
+.input-slot-field.is-error   { border-color: #EF4444; background: #FEF2F2; }
+.input-slot-field.is-dup     { border-color: #F59E0B; background: #FFFBEB; }
+
+.input-slot-preview {
+  font-size: 11px;
+  min-height: 16px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.input-slot-preview.preview-name  { color: #065F46; font-weight: 600; }
+.input-slot-preview.preview-error { color: #DC2626; }
+.input-slot-preview.preview-dup   { color: #92400E; }
+
+.input-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.input-error-summary {
+  font-size: 12px;
+  color: #DC2626;
+  flex: 1;
+}
+
+.input-result-box {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: none;
+}
+
+.input-result-box.visible { display: block; }
+
+.input-result-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--gray-400);
+  margin-bottom: 8px;
+}
+
+.input-result-url {
+  font-size: 12px;
+  color: var(--gray-700);
+  word-break: break-all;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.input-result-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+/* ---- Responsive for input grid ---- */
+@media (max-width: 768px) {
+  .input-slots-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Footer styles live in main.css */

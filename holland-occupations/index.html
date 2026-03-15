@@ -36,6 +36,8 @@
               onclick="switchMode('select')">✏️ 選擇模式</button>
       <button class="mode-btn" id="mode-display-btn"
               onclick="switchMode('display')">📊 展示模式</button>
+      <button class="mode-btn" id="mode-input-btn"
+              onclick="switchMode('input')">📋 快速輸入</button>
       <div class="mode-spacer"></div>
       <button class="btn btn-outline" onclick="resetAll()">🔄 重新開始</button>
       <button class="btn btn-primary" onclick="shareResult()">🔗 分享結果</button>
@@ -95,6 +97,35 @@
       </div>
 
     </div><!-- /select-view -->
+
+    <!-- ===== INPUT VIEW ===== -->
+    <div id="input-view" style="display:none;">
+      <div class="input-panel">
+
+        <div class="input-panel-intro">
+          <strong>諮詢師快速輸入工具：</strong>
+          請輸入最多 12 個職業的編號（參考右側「選擇模式」卡片上的 ID），系統將自動驗證並產生分享連結，可直接傳給個案使用。
+        </div>
+
+        <div class="input-slots-grid" id="input-slots-grid">
+          <!-- slots injected by JS -->
+        </div>
+
+        <div class="input-actions">
+          <button class="btn btn-primary" onclick="generateInputURL()">🔗 產生連結</button>
+          <button class="btn btn-outline" onclick="clearInputPanel()">✕ 清除</button>
+          <span class="input-error-summary" id="input-error-summary"></span>
+        </div>
+
+        <div class="input-result-box" id="input-result-box">
+          <div class="input-result-label">已產生的分享連結</div>
+          <div class="input-result-url" id="input-result-url"></div>
+          <div class="input-result-names" id="input-result-names"></div>
+          <button class="btn btn-primary" onclick="copyInputURL()">📋 複製連結</button>
+        </div>
+
+      </div>
+    </div><!-- /input-view -->
 
     <!-- ===== DISPLAY VIEW ===== -->
     <div id="display-view" style="display:none;">

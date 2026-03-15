@@ -17,9 +17,9 @@ const NAV_ITEMS = [
   {
     section: '測驗工具',
     items: [
-      { key: 'holland-basic',       icon: '🎯', label: 'Holland Code 排序',   href: 'holland-basic/index.html' },
-      { key: 'holland-occupations', icon: '💼', label: 'Holland 職業選擇',     href: 'holland-occupations/index.html' },
-      { key: 'inventory',           icon: '🧩', label: '職能盤點',             href: 'inventory/index.html' }
+      { key: 'holland-basic',       icon: '🎯', label: '旅人卡 - 何倫碼',   href: 'holland-basic/index.html' },
+      { key: 'holland-occupations', icon: '💼', label: '旅人卡 - 職業偏好',     href: 'holland-occupations/index.html' },
+      { key: 'inventory',           icon: '🧩', label: '職能盤點卡',             href: 'inventory/index.html' }
     ]
   }
 ];

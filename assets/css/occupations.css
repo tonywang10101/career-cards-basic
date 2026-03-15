@@ -627,3 +627,80 @@
 }
 
 /* Footer styles live in main.css */
+/* ---- Spread grid ---- */
+.occ-spread-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 28px 10px;
+  padding: 4px 2px 20px;
+}
+
+.occ-spr-wrap {
+  position: relative;
+  margin-top: 32px;
+}
+
+.occ-spr-actions {
+  position: absolute;
+  top: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 1;
+}
+
+.occ-spr-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-200);
+  background: white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  gap: 1px;
+  transition: all .15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.09);
+  color: var(--gray-500);
+  line-height: 1.2;
+}
+
+.occ-spr-btn span:first-child { font-size: 15px; }
+
+.spr-like-btn:hover:not(:disabled)  { border-color: #10B981; color: #10B981; background: #ECFDF5; }
+.spr-like-btn.selected              { border-color: #10B981; background: #10B981; color: white; }
+.spr-dislike-btn:hover:not(:disabled){ border-color: #EF4444; color: #EF4444; background: #FEF2F2; }
+.spr-dislike-btn.selected           { border-color: #EF4444; background: #EF4444; color: white; }
+.occ-spr-btn:disabled               { opacity: .3; cursor: not-allowed; }
+
+.occ-spr-card {
+  background: white;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 8px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 68px;
+  transition: border-color .2s, background .2s;
+}
+
+.occ-spr-card.spr-is-liked    { border-color: #10B981; background: #ECFDF5; }
+.occ-spr-card.spr-is-disliked { opacity: .45; }
+
+.occ-spr-codes { display: flex; gap: 3px; flex-wrap: wrap; margin-bottom: 2px; }
+.occ-spr-codes .occ-code-letter { font-size: 10px; padding: 1px 4px; border-radius: 3px; }
+
+.occ-spr-name  { font-size: 12px; font-weight: 800; color: var(--gray-800); line-height: 1.3; }
+.occ-spr-field { font-size: 10px; color: var(--gray-400); line-height: 1.3; }
+
+@media (max-width: 768px) {
+  .occ-spread-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 28px 6px; }
+  .occ-spr-btn { width: 40px; height: 40px; font-size: 9px; }
+  .occ-spr-btn span:first-child { font-size: 12px; }
+}

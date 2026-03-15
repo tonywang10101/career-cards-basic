@@ -171,31 +171,30 @@ function initOccupations() {
 // ===================================================================
 
 function switchMode(mode) {
-  const selectView  = document.getElementById('select-view');
-  const displayView = document.getElementById('display-view');
-  const inputView   = document.getElementById('input-view');
-  const selectBtn   = document.getElementById('mode-select-btn');
-  const displayBtn  = document.getElementById('mode-display-btn');
-  const inputBtn    = document.getElementById('mode-input-btn');
-
-  // Hide all, deactivate all
-  [selectView, displayView, inputView].forEach(v => { if (v) v.style.display = 'none'; });
-  [selectBtn, displayBtn, inputBtn].forEach(b => { if (b) b.classList.remove('active'); });
+  const views   = ['select-view', 'occ-spread-view', 'display-view', 'input-view'];
+  const buttons = ['mode-select-btn', 'mode-spread-btn', 'mode-display-btn', 'mode-input-btn'];
+  views.forEach(id   => { const el = document.getElementById(id);   if (el) el.style.display = 'none'; });
+  buttons.forEach(id => { const el = document.getElementById(id);   if (el) el.classList.remove('active'); });
 
   if (mode === 'select') {
-    if (selectView) selectView.style.display = '';
-    if (selectBtn)  selectBtn.classList.add('active');
-    renderCards();
-    renderDots();
-    updateStatusBar();
-    renderChips();
+    const el = document.getElementById('select-view');
+    const btn = document.getElementById('mode-select-btn');
+    if (el) el.style.display = ''; if (btn) btn.classList.add('active');
+    renderCards(); renderDots(); updateStatusBar(); renderChips();
+  } else if (mode === 'spread') {
+    const el = document.getElementById('occ-spread-view');
+    const btn = document.getElementById('mode-spread-btn');
+    if (el) el.style.display = ''; if (btn) btn.classList.add('active');
+    renderOccSpreadCards(); renderChips(); updateStatusBar();
   } else if (mode === 'input') {
-    if (inputView) inputView.style.display = '';
-    if (inputBtn)  inputBtn.classList.add('active');
+    const el = document.getElementById('input-view');
+    const btn = document.getElementById('mode-input-btn');
+    if (el) el.style.display = ''; if (btn) btn.classList.add('active');
     renderInputSlots();
   } else {
-    if (displayView) displayView.style.display = '';
-    if (displayBtn)  displayBtn.classList.add('active');
+    const el = document.getElementById('display-view');
+    const btn = document.getElementById('mode-display-btn');
+    if (el) el.style.display = ''; if (btn) btn.classList.add('active');
     renderDisplay();
   }
 }
@@ -356,20 +355,19 @@ function refreshCardUI(cardIndex) {
 
 function removeLike(id) {
   liked.delete(id);
-  // Reset to unevaluated (not disliked)
   disliked.delete(id);
 
   const cardIndex = OCCUPATIONS.findIndex(o => o.id === id);
   if (cardIndex !== -1) refreshCardUI(cardIndex);
 
-  updateStatusBar();
-  renderChips();
-  updateDots();
-
   // Re-enable like buttons on all cards that were disabled at MAX
   OCCUPATIONS.forEach((_, i) => refreshCardUI(i));
 
-  // Hide complete banner since something was un-evaluated
+  // Also refresh spread view
+  refreshOccSpreadCardUI(id);
+  refreshAllOccSpreadDisabled();
+
+  updateStatusBar(); renderChips(); updateDots();
   document.getElementById('occ-complete-banner').style.display = 'none';
 }
 
@@ -399,7 +397,23 @@ function updateStatusBar() {
   }
 }
 
+function _renderChipContainer(containerId, countId) {
+  const container = document.getElementById(containerId);
+  const countEl   = document.getElementById(countId);
+  if (!container) return;
+  if (countEl) countEl.textContent = `${liked.size} / ${MAX_LIKE}`;
+  if (liked.size === 0) { container.innerHTML = `<span class="liked-chips-empty">尚未選擇喜歡的職業</span>`; return; }
+  container.innerHTML = [...liked].map(id => {
+    const occ = OCCUPATIONS.find(o => o.id === id);
+    if (!occ) return '';
+    return `<div class="liked-chip">${occ.name}<button class="liked-chip-remove" onclick="removeLike(${id})" title="移除 ${occ.name}">✕</button></div>`;
+  }).join('');
+}
+
 function renderChips() {
+  // Also update spread view chip strip (if exists)
+  _renderChipContainer('occ-spr-liked-chips', 'occ-spr-liked-count');
+
   const container = document.getElementById('liked-chips');
   const countEl   = document.getElementById('chips-count');
   if (!container) return;
@@ -711,6 +725,83 @@ function copyInputURL() {
 
 function clearInputPanel() {
   renderInputSlots();
+}
+
+// ===================================================================
+// SPREAD VIEW
+// ===================================================================
+
+function renderOccSpreadCards() {
+  const grid = document.getElementById('occ-spread-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  OCCUPATIONS.forEach(occ => {
+    const isLiked    = liked.has(occ.id);
+    const isDisliked = disliked.has(occ.id);
+    const atMax      = liked.size >= MAX_LIKE;
+    const stateClass = isLiked ? 'spr-is-liked' : (isDisliked ? 'spr-is-disliked' : '');
+
+    const wrap = document.createElement('div');
+    wrap.className = 'occ-spr-wrap';
+    wrap.id = `occ-spr-wrap-${occ.id}`;
+    wrap.innerHTML = `
+      <div class="occ-spr-actions">
+        <button class="occ-spr-btn spr-like-btn ${isLiked ? 'selected' : ''}"
+                ${atMax && !isLiked ? 'disabled' : ''}
+                onclick="handleLikeSpread(${occ.id})">
+          <span>😊</span><span>喜歡</span>
+        </button>
+        <button class="occ-spr-btn spr-dislike-btn ${isDisliked ? 'selected' : ''}"
+                onclick="handleDislikeSpread(${occ.id})">
+          <span>😶</span><span>不喜歡</span>
+        </button>
+      </div>
+      <div class="occ-spr-card ${stateClass}">
+        <div class="occ-spr-codes">${renderCodeBadges(occ.code)}</div>
+        <div class="occ-spr-name">${occ.name}</div>
+        <div class="occ-spr-field">${occ.field}</div>
+        <div style="font-size:10px;color:var(--gray-400);margin-top:2px">#${occ.id}</div>
+      </div>`;
+    grid.appendChild(wrap);
+  });
+}
+
+function handleLikeSpread(id) {
+  if (liked.size >= MAX_LIKE && !liked.has(id)) {
+    showToast(`最多只能選 ${MAX_LIKE} 個喜歡的職業！`); return;
+  }
+  liked.add(id); disliked.delete(id);
+  refreshOccSpreadCardUI(id); refreshAllOccSpreadDisabled();
+  updateStatusBar(); renderChips();
+}
+
+function handleDislikeSpread(id) {
+  disliked.add(id); liked.delete(id);
+  refreshOccSpreadCardUI(id); refreshAllOccSpreadDisabled();
+  updateStatusBar(); renderChips();
+}
+
+function refreshOccSpreadCardUI(id) {
+  const wrap = document.getElementById(`occ-spr-wrap-${id}`);
+  if (!wrap) return;
+  const isLiked    = liked.has(id);
+  const isDisliked = disliked.has(id);
+  const card    = wrap.querySelector('.occ-spr-card');
+  const likeBtn = wrap.querySelector('.spr-like-btn');
+  const disBtn  = wrap.querySelector('.spr-dislike-btn');
+  if (card) card.className = 'occ-spr-card' + (isLiked ? ' spr-is-liked' : isDisliked ? ' spr-is-disliked' : '');
+  if (likeBtn) likeBtn.classList.toggle('selected', isLiked);
+  if (disBtn)  disBtn.classList.toggle('selected', isDisliked);
+}
+
+function refreshAllOccSpreadDisabled() {
+  const atMax = liked.size >= MAX_LIKE;
+  OCCUPATIONS.forEach(occ => {
+    const wrap = document.getElementById(`occ-spr-wrap-${occ.id}`);
+    if (!wrap) return;
+    const likeBtn = wrap.querySelector('.spr-like-btn');
+    if (likeBtn) likeBtn.disabled = atMax && !liked.has(occ.id);
+  });
 }
 
 // ===================================================================

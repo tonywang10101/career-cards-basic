@@ -6,12 +6,11 @@
 const MAX_STRENGTH = 7;
 const MAX_WEAKNESS = 7;
 
-// Per-category colors
 const CATEGORY_META = {
-  'Action & Execution': { color: '#F97316', bg: '#FFF7ED', label: '行動執行' },
-  'Thinking & Mindset': { color: '#6366F1', bg: '#EEF2FF', label: '思維心態' },
+  'Action & Execution':  { color: '#F97316', bg: '#FFF7ED', label: '行動執行' },
+  'Thinking & Mindset':  { color: '#6366F1', bg: '#EEF2FF', label: '思維心態' },
   'People & Leadership': { color: '#10B981', bg: '#ECFDF5', label: '人際領導' },
-  'Skills & Application': { color: '#0EA5E9', bg: '#F0F9FF', label: '技能應用' }
+  'Skills & Application':{ color: '#0EA5E9', bg: '#F0F9FF', label: '技能應用' }
 };
 
 // ===== CARD DATA =====
@@ -81,12 +80,13 @@ const INVENTORY_CARDS = [
 // ===================================================================
 // STATE
 // ===================================================================
-let strength = new Set();  // card ids rated as 強勢
-let weakness = new Set();  // card ids rated as 劣勢
+let strength = new Set();
+let weakness = new Set();
+let skipped  = new Set();
 let currentIndex = 0;
 
 // ===================================================================
-// URL PARAMS
+// URL PARAMS  (skipped is not serialized – it's session-only)
 // Share URL format:  ?strength=1,2,3&weakness=4,5,6
 // ===================================================================
 
@@ -98,8 +98,7 @@ function buildShareURL() {
 }
 
 function parseURLState() {
-  const params = new URLSearchParams(window.location.search);
-
+  const params   = new URLSearchParams(window.location.search);
   const parseIds = key => {
     const raw = params.get(key);
     if (!raw) return new Set();
@@ -109,7 +108,6 @@ function parseURLState() {
          .filter(n => !isNaN(n) && INVENTORY_CARDS.some(c => c.id === n))
     );
   };
-
   const s = parseIds('strength');
   const w = parseIds('weakness');
   return (s.size > 0 || w.size > 0) ? { strength: s, weakness: w } : null;
@@ -135,51 +133,44 @@ function initInventory() {
 // ===================================================================
 
 function switchMode(mode) {
-  const selectView  = document.getElementById('inv-select-view');
-  const displayView = document.getElementById('inv-display-view');
-  const inputView   = document.getElementById('inv-input-view');
-  const selectBtn   = document.getElementById('mode-select-btn');
-  const displayBtn  = document.getElementById('mode-display-btn');
-  const inputBtn    = document.getElementById('mode-input-btn');
-
-  [selectView, displayView, inputView].forEach(v => { if (v) v.style.display = 'none'; });
-  [selectBtn, displayBtn, inputBtn].forEach(b => { if (b) b.classList.remove('active'); });
+  const views   = ['inv-select-view', 'inv-spread-view', 'inv-display-view', 'inv-input-view'];
+  const buttons = ['mode-select-btn', 'mode-spread-btn', 'mode-display-btn', 'mode-input-btn'];
+  views.forEach(id   => { const el = document.getElementById(id);   if (el) el.style.display = 'none'; });
+  buttons.forEach(id => { const el = document.getElementById(id);   if (el) el.classList.remove('active'); });
 
   if (mode === 'select') {
-    if (selectView) selectView.style.display = '';
-    if (selectBtn)  selectBtn.classList.add('active');
-    renderCards();
-    renderDots();
-    updateStatusBar();
-    renderChips();
+    _show('inv-select-view');  _active('mode-select-btn');
+    renderCards(); renderDots(); updateStatusBar(); renderChips();
+  } else if (mode === 'spread') {
+    _show('inv-spread-view');  _active('mode-spread-btn');
+    renderSpreadCards(); renderChips(); updateStatusBar();
   } else if (mode === 'input') {
-    if (inputView) inputView.style.display = '';
-    if (inputBtn)  inputBtn.classList.add('active');
+    _show('inv-input-view');   _active('mode-input-btn');
     renderInputSlots();
   } else {
-    if (displayView) displayView.style.display = '';
-    if (displayBtn)  displayBtn.classList.add('active');
+    _show('inv-display-view'); _active('mode-display-btn');
     renderDisplay();
   }
 }
+
+function _show(id)   { const el = document.getElementById(id); if (el) el.style.display = ''; }
+function _active(id) { const el = document.getElementById(id); if (el) el.classList.add('active'); }
 
 // ===================================================================
 // HELPERS
 // ===================================================================
 
 function getCategoryMeta(category) {
-  // Normalize (trim trailing spaces)
-  const key = category.trim();
-  return CATEGORY_META[key] || { color: '#6B7280', bg: '#F3F4F6', label: key };
+  return CATEGORY_META[category.trim()] || { color: '#6B7280', bg: '#F3F4F6', label: category.trim() };
 }
 
 function renderDescList(desc) {
-  return desc.split(';').map(item => item.trim()).filter(Boolean)
-    .map(item => `<li>${item}</li>`).join('');
+  return desc.split(';').map(s => s.trim()).filter(Boolean)
+    .map(s => `<li>${s}</li>`).join('');
 }
 
 // ===================================================================
-// SELECTION VIEW – CARDS
+// CAROUSEL VIEW – CARDS
 // ===================================================================
 
 function renderCards() {
@@ -188,19 +179,19 @@ function renderCards() {
   track.innerHTML = '';
 
   INVENTORY_CARDS.forEach((card, i) => {
-    const isStrength = strength.has(card.id);
-    const isWeakness = weakness.has(card.id);
-    const atMaxStr   = strength.size >= MAX_STRENGTH;
-    const atMaxWeak  = weakness.size >= MAX_WEAKNESS;
-    const meta       = getCategoryMeta(card.category);
+    const isStr  = strength.has(card.id);
+    const isWeak = weakness.has(card.id);
+    const isSk   = skipped.has(card.id);
+    const atMaxStr  = strength.size >= MAX_STRENGTH;
+    const atMaxWeak = weakness.size >= MAX_WEAKNESS;
+    const meta = getCategoryMeta(card.category);
 
-    const statusLabel = isStrength ? '強勢 ✓' : (isWeakness ? '劣勢 ✓' : '');
-    const statusClass = isStrength ? 'is-strength' : (isWeakness ? 'is-weakness' : '');
+    const statusLabel = isStr ? '強勢 ✓' : (isWeak ? '劣勢 ✓' : (isSk ? '略過' : ''));
+    const statusClass = isStr ? 'is-strength' : (isWeak ? 'is-weakness' : (isSk ? 'is-skipped' : ''));
 
     const slide = document.createElement('div');
     slide.className = 'inv-card-slide';
     slide.id = `inv-slide-${i}`;
-
     slide.innerHTML = `
       <div class="inv-card-inner ${statusClass}">
         <div class="inv-card-status-ribbon">${statusLabel}</div>
@@ -216,13 +207,17 @@ function renderCards() {
           <span class="inv-shadow-text">${card.shadow}</span>
         </div>
         <div class="inv-action-buttons">
-          <button class="inv-action-btn strength-btn ${isStrength ? 'selected' : ''}"
-                  ${atMaxStr && !isStrength ? 'disabled' : ''}
+          <button class="inv-action-btn strength-btn ${isStr ? 'selected' : ''}"
+                  ${atMaxStr && !isStr ? 'disabled' : ''}
                   onclick="handleStrength(${card.id}, ${i})">
             <span class="inv-action-icon">💪</span>強勢
           </button>
-          <button class="inv-action-btn weakness-btn ${isWeakness ? 'selected' : ''}"
-                  ${atMaxWeak && !isWeakness ? 'disabled' : ''}
+          <button class="inv-action-btn skip-btn ${isSk ? 'selected' : ''}"
+                  onclick="handleSkip(${card.id}, ${i})">
+            <span class="inv-action-icon">⏭</span>略過
+          </button>
+          <button class="inv-action-btn weakness-btn ${isWeak ? 'selected' : ''}"
+                  ${atMaxWeak && !isWeak ? 'disabled' : ''}
                   onclick="handleWeakness(${card.id}, ${i})">
             <span class="inv-action-icon">🌱</span>劣勢
           </button>
@@ -236,42 +231,35 @@ function renderCards() {
 }
 
 // ===================================================================
-// ACTIONS
+// CAROUSEL ACTIONS
 // ===================================================================
 
 function handleStrength(id, cardIndex) {
   if (strength.size >= MAX_STRENGTH && !strength.has(id)) {
-    showToast(`強勢職能最多只能選 ${MAX_STRENGTH} 個！`);
-    return;
+    showToast(`強勢職能最多只能選 ${MAX_STRENGTH} 個！`); return;
   }
-  strength.add(id);
-  weakness.delete(id);
+  strength.add(id); weakness.delete(id); skipped.delete(id);
   afterAction(id, cardIndex);
 }
 
 function handleWeakness(id, cardIndex) {
   if (weakness.size >= MAX_WEAKNESS && !weakness.has(id)) {
-    showToast(`劣勢職能最多只能選 ${MAX_WEAKNESS} 個！`);
-    return;
+    showToast(`劣勢職能最多只能選 ${MAX_WEAKNESS} 個！`); return;
   }
-  weakness.add(id);
-  strength.delete(id);
+  weakness.add(id); strength.delete(id); skipped.delete(id);
+  afterAction(id, cardIndex);
+}
+
+function handleSkip(id, cardIndex) {
+  skipped.add(id); strength.delete(id); weakness.delete(id);
   afterAction(id, cardIndex);
 }
 
 function afterAction(id, cardIndex) {
-  updateStatusBar();
-  renderChips();
-  refreshCardUI(cardIndex);
-  updateDots();
-
-  const nextUnevaluated = findNextUnevaluated(cardIndex);
-  if (nextUnevaluated !== null) {
-    setTimeout(() => goToCard(nextUnevaluated), 300);
-  }
-
-  const evaluated = strength.size + weakness.size;
-  if (evaluated === INVENTORY_CARDS.length) {
+  updateStatusBar(); renderChips(); refreshCardUI(cardIndex); updateDots();
+  const next = findNextUnevaluated(cardIndex);
+  if (next !== null) setTimeout(() => goToCard(next), 300);
+  if (strength.size + weakness.size + skipped.size === INVENTORY_CARDS.length) {
     document.getElementById('inv-complete-banner').style.display = '';
   }
 }
@@ -279,56 +267,51 @@ function afterAction(id, cardIndex) {
 function findNextUnevaluated(fromIndex) {
   for (let i = fromIndex + 1; i < INVENTORY_CARDS.length; i++) {
     const c = INVENTORY_CARDS[i];
-    if (!strength.has(c.id) && !weakness.has(c.id)) return i;
+    if (!strength.has(c.id) && !weakness.has(c.id) && !skipped.has(c.id)) return i;
   }
   for (let i = 0; i < fromIndex; i++) {
     const c = INVENTORY_CARDS[i];
-    if (!strength.has(c.id) && !weakness.has(c.id)) return i;
+    if (!strength.has(c.id) && !weakness.has(c.id) && !skipped.has(c.id)) return i;
   }
   return null;
 }
 
 function refreshCardUI(cardIndex) {
-  const card     = INVENTORY_CARDS[cardIndex];
-  const inner    = document.querySelector(`#inv-slide-${cardIndex} .inv-card-inner`);
-  const ribbon   = document.querySelector(`#inv-slide-${cardIndex} .inv-card-status-ribbon`);
-  const strBtn   = document.querySelector(`#inv-slide-${cardIndex} .strength-btn`);
-  const weakBtn  = document.querySelector(`#inv-slide-${cardIndex} .weakness-btn`);
+  const card   = INVENTORY_CARDS[cardIndex];
+  const inner  = document.querySelector(`#inv-slide-${cardIndex} .inv-card-inner`);
+  const ribbon = document.querySelector(`#inv-slide-${cardIndex} .inv-card-status-ribbon`);
+  const strBtn = document.querySelector(`#inv-slide-${cardIndex} .strength-btn`);
+  const weakBtn= document.querySelector(`#inv-slide-${cardIndex} .weakness-btn`);
+  const skipBtn= document.querySelector(`#inv-slide-${cardIndex} .skip-btn`);
   if (!inner) return;
 
-  const isStrength = strength.has(card.id);
-  const isWeakness = weakness.has(card.id);
-  const atMaxStr   = strength.size >= MAX_STRENGTH;
-  const atMaxWeak  = weakness.size >= MAX_WEAKNESS;
+  const isStr  = strength.has(card.id);
+  const isWeak = weakness.has(card.id);
+  const isSk   = skipped.has(card.id);
+  const atMaxStr  = strength.size >= MAX_STRENGTH;
+  const atMaxWeak = weakness.size >= MAX_WEAKNESS;
 
-  inner.classList.toggle('is-strength', isStrength);
-  inner.classList.toggle('is-weakness', isWeakness);
+  inner.className = 'inv-card-inner' +
+    (isStr ? ' is-strength' : isWeak ? ' is-weakness' : isSk ? ' is-skipped' : '');
 
-  if (ribbon) ribbon.textContent = isStrength ? '強勢 ✓' : (isWeakness ? '劣勢 ✓' : '');
-
-  if (strBtn) {
-    strBtn.classList.toggle('selected', isStrength);
-    strBtn.disabled = atMaxStr && !isStrength;
-  }
-  if (weakBtn) {
-    weakBtn.classList.toggle('selected', isWeakness);
-    weakBtn.disabled = atMaxWeak && !isWeakness;
-  }
+  if (ribbon) ribbon.textContent = isStr ? '強勢 ✓' : (isWeak ? '劣勢 ✓' : (isSk ? '略過' : ''));
+  if (strBtn)  { strBtn.classList.toggle('selected', isStr);   strBtn.disabled  = atMaxStr  && !isStr; }
+  if (weakBtn) { weakBtn.classList.toggle('selected', isWeak); weakBtn.disabled = atMaxWeak && !isWeak; }
+  if (skipBtn) { skipBtn.classList.toggle('selected', isSk); }
 }
 
 // ===================================================================
-// REMOVE FROM CHIP STRIPS
+// REMOVE FROM CHIPS
 // ===================================================================
 
 function removeStrength(id) {
   strength.delete(id);
   const idx = INVENTORY_CARDS.findIndex(c => c.id === id);
   if (idx !== -1) refreshCardUI(idx);
-  // Re-enable disabled buttons
-  INVENTORY_CARDS.forEach((_, i) => refreshCardUI(i));
-  updateStatusBar();
-  renderChips();
-  updateDots();
+  INVENTORY_CARDS.forEach((_, i) => refreshCardUI(i)); // re-enable buttons
+  refreshSpreadCardUI(id);
+  refreshAllSpreadDisabled();
+  updateStatusBar(); renderChips(); updateDots();
   document.getElementById('inv-complete-banner').style.display = 'none';
 }
 
@@ -337,9 +320,9 @@ function removeWeakness(id) {
   const idx = INVENTORY_CARDS.findIndex(c => c.id === id);
   if (idx !== -1) refreshCardUI(idx);
   INVENTORY_CARDS.forEach((_, i) => refreshCardUI(i));
-  updateStatusBar();
-  renderChips();
-  updateDots();
+  refreshSpreadCardUI(id);
+  refreshAllSpreadDisabled();
+  updateStatusBar(); renderChips(); updateDots();
   document.getElementById('inv-complete-banner').style.display = 'none';
 }
 
@@ -348,10 +331,10 @@ function removeWeakness(id) {
 // ===================================================================
 
 function updateStatusBar() {
-  const evaluated = strength.size + weakness.size;
+  const evaluated = strength.size + weakness.size + skipped.size;
   const total     = INVENTORY_CARDS.length;
-  const remaining = total - evaluated;
   const pct       = (evaluated / total) * 100;
+  const remaining = total - evaluated;
 
   const strCountEl  = document.getElementById('inv-strength-counter');
   const weakCountEl = document.getElementById('inv-weakness-counter');
@@ -359,45 +342,34 @@ function updateStatusBar() {
   const labelEl     = document.getElementById('inv-progress-label');
   const remainEl    = document.getElementById('inv-remaining-text');
 
-  if (strCountEl)  strCountEl.innerHTML =
-    `<span class="badge-num">${strength.size}</span> / ${MAX_STRENGTH} 強勢`;
-  if (weakCountEl) weakCountEl.innerHTML =
-    `<span class="badge-num badge-weak">${weakness.size}</span> / ${MAX_WEAKNESS} 劣勢`;
+  if (strCountEl)  strCountEl.innerHTML  = `<span class="badge-num">${strength.size}</span> / ${MAX_STRENGTH} 強勢`;
+  if (weakCountEl) weakCountEl.innerHTML = `<span class="badge-num badge-weak">${weakness.size}</span> / ${MAX_WEAKNESS} 劣勢`;
   if (progressEl)  progressEl.style.width = `${pct}%`;
-  if (labelEl)     labelEl.textContent = `已評估 ${evaluated} / ${total} 張`;
-  if (remainEl) {
-    remainEl.textContent = remaining > 0
-      ? `還有 ${remaining} 張未評估`
-      : '所有卡片已評估完畢 ✓';
-  }
+  if (labelEl)     labelEl.textContent   = `已評估 ${evaluated} / ${total} 張`;
+  if (remainEl)    remainEl.textContent  = remaining > 0 ? `還有 ${remaining} 張未評估` : '所有卡片已評估完畢 ✓';
 }
 
 function renderChips() {
-  renderChipSet('inv-strength-chips', 'inv-chips-str-count', strength, 'removeStrength', MAX_STRENGTH);
-  renderChipSet('inv-weakness-chips', 'inv-chips-weak-count', weakness, 'removeWeakness', MAX_WEAKNESS);
+  // Carousel mode chip strips
+  renderChipSet('inv-strength-chips',  'inv-chips-str-count',  strength, 'removeStrength', MAX_STRENGTH);
+  renderChipSet('inv-weakness-chips',  'inv-chips-weak-count', weakness, 'removeWeakness', MAX_WEAKNESS);
+  // Spread mode chip strips
+  renderChipSet('inv-spr-str-chips',   'inv-spr-str-count',    strength, 'removeStrength', MAX_STRENGTH);
+  renderChipSet('inv-spr-weak-chips',  'inv-spr-weak-count',   weakness, 'removeWeakness', MAX_WEAKNESS);
 }
 
 function renderChipSet(containerId, countId, set, removeFn, max) {
   const container = document.getElementById(containerId);
   const countEl   = document.getElementById(countId);
   if (!container) return;
-
   if (countEl) countEl.textContent = `${set.size} / ${max}`;
-
-  if (set.size === 0) {
-    container.innerHTML = `<span class="inv-chips-empty">尚未選擇</span>`;
-    return;
-  }
-
+  if (set.size === 0) { container.innerHTML = `<span class="inv-chips-empty">尚未選擇</span>`; return; }
   container.innerHTML = [...set].map(id => {
     const card = INVENTORY_CARDS.find(c => c.id === id);
     if (!card) return '';
-    return `
-      <div class="inv-chip">
-        ${card.title}
-        <button class="inv-chip-remove" onclick="${removeFn}(${id})"
-                title="移除 ${card.title}">✕</button>
-      </div>`;
+    return `<div class="inv-chip">${card.title}
+      <button class="inv-chip-remove" onclick="${removeFn}(${id})" title="移除">✕</button>
+    </div>`;
   }).join('');
 }
 
@@ -407,9 +379,7 @@ function renderChipSet(containerId, countId, set, removeFn, max) {
 
 function goToCard(i) {
   currentIndex = Math.max(0, Math.min(i, INVENTORY_CARDS.length - 1));
-  updateCarouselPosition();
-  updateArrows();
-  updateDots();
+  updateCarouselPosition(); updateArrows(); updateDots();
 }
 
 function prevCard() { goToCard(currentIndex - 1); }
@@ -433,21 +403,110 @@ function renderDots() {
   dotsEl.innerHTML = '';
   INVENTORY_CARDS.forEach((card, i) => {
     const dot = document.createElement('div');
-    const stateClass = strength.has(card.id) ? 'is-strength' : (weakness.has(card.id) ? 'is-weakness' : '');
-    dot.className = `inv-carousel-dot ${stateClass} ${i === currentIndex ? 'active' : ''}`;
+    dot.className = `inv-carousel-dot ${dotClass(card.id)} ${i === currentIndex ? 'active' : ''}`;
     dot.title = card.title;
     dot.onclick = () => goToCard(i);
     dotsEl.appendChild(dot);
   });
 }
 
+function dotClass(id) {
+  return strength.has(id) ? 'is-strength' : (weakness.has(id) ? 'is-weakness' : (skipped.has(id) ? 'is-skipped-dot' : ''));
+}
+
 function updateDots() {
   document.querySelectorAll('#inv-carousel-dots .inv-carousel-dot').forEach((dot, i) => {
     const card = INVENTORY_CARDS[i];
-    dot.className = 'inv-carousel-dot';
-    if (strength.has(card.id))      dot.classList.add('is-strength');
-    else if (weakness.has(card.id)) dot.classList.add('is-weakness');
-    if (i === currentIndex)         dot.classList.add('active');
+    dot.className = `inv-carousel-dot ${dotClass(card.id)} ${i === currentIndex ? 'active' : ''}`;
+  });
+}
+
+// ===================================================================
+// SPREAD VIEW
+// ===================================================================
+
+function renderSpreadCards() {
+  const grid = document.getElementById('inv-spread-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  INVENTORY_CARDS.forEach(card => {
+    const isStr  = strength.has(card.id);
+    const isWeak = weakness.has(card.id);
+    const isSk   = skipped.has(card.id);
+    const atMaxStr  = strength.size >= MAX_STRENGTH;
+    const atMaxWeak = weakness.size >= MAX_WEAKNESS;
+    const meta = getCategoryMeta(card.category);
+    const stateClass = isStr ? 'spr-is-strength' : (isWeak ? 'spr-is-weakness' : (isSk ? 'spr-is-skipped' : ''));
+
+    const wrap = document.createElement('div');
+    wrap.className = 'inv-spr-wrap';
+    wrap.id = `inv-spr-wrap-${card.id}`;
+    wrap.innerHTML = `
+      <div class="inv-spr-actions">
+        <button class="inv-spr-btn spr-str-btn ${isStr ? 'selected' : ''}"
+                ${atMaxStr && !isStr ? 'disabled' : ''}
+                onclick="handleStrSpread(${card.id})">
+          <span>💪</span><span>強勢</span>
+        </button>
+        <button class="inv-spr-btn spr-weak-btn ${isWeak ? 'selected' : ''}"
+                ${atMaxWeak && !isWeak ? 'disabled' : ''}
+                onclick="handleWeakSpread(${card.id})">
+          <span>🌱</span><span>劣勢</span>
+        </button>
+      </div>
+      <div class="inv-spr-card ${stateClass}">
+        <span class="inv-category-badge"
+              style="background:${meta.bg};color:${meta.color};font-size:10px">${meta.label}</span>
+        <div class="inv-spr-title">${card.title}</div>
+        <div class="inv-card-id">#${card.id}</div>
+      </div>`;
+    grid.appendChild(wrap);
+  });
+}
+
+function handleStrSpread(id) {
+  if (strength.size >= MAX_STRENGTH && !strength.has(id)) {
+    showToast(`強勢職能最多只能選 ${MAX_STRENGTH} 個！`); return;
+  }
+  strength.add(id); weakness.delete(id); skipped.delete(id);
+  refreshSpreadCardUI(id); refreshAllSpreadDisabled();
+  updateStatusBar(); renderChips();
+}
+
+function handleWeakSpread(id) {
+  if (weakness.size >= MAX_WEAKNESS && !weakness.has(id)) {
+    showToast(`劣勢職能最多只能選 ${MAX_WEAKNESS} 個！`); return;
+  }
+  weakness.add(id); strength.delete(id); skipped.delete(id);
+  refreshSpreadCardUI(id); refreshAllSpreadDisabled();
+  updateStatusBar(); renderChips();
+}
+
+function refreshSpreadCardUI(id) {
+  const wrap = document.getElementById(`inv-spr-wrap-${id}`);
+  if (!wrap) return;
+  const isStr  = strength.has(id);
+  const isWeak = weakness.has(id);
+  const isSk   = skipped.has(id);
+  const card   = wrap.querySelector('.inv-spr-card');
+  const strBtn = wrap.querySelector('.spr-str-btn');
+  const weakBtn= wrap.querySelector('.spr-weak-btn');
+  if (card) card.className = 'inv-spr-card' +
+    (isStr ? ' spr-is-strength' : isWeak ? ' spr-is-weakness' : isSk ? ' spr-is-skipped' : '');
+  if (strBtn)  strBtn.classList.toggle('selected', isStr);
+  if (weakBtn) weakBtn.classList.toggle('selected', isWeak);
+}
+
+function refreshAllSpreadDisabled() {
+  const atMaxStr  = strength.size >= MAX_STRENGTH;
+  const atMaxWeak = weakness.size >= MAX_WEAKNESS;
+  INVENTORY_CARDS.forEach(card => {
+    const wrap = document.getElementById(`inv-spr-wrap-${card.id}`);
+    if (!wrap) return;
+    const strBtn  = wrap.querySelector('.spr-str-btn');
+    const weakBtn = wrap.querySelector('.spr-weak-btn');
+    if (strBtn)  strBtn.disabled  = atMaxStr  && !strength.has(card.id);
+    if (weakBtn) weakBtn.disabled = atMaxWeak && !weakness.has(card.id);
   });
 }
 
@@ -464,35 +523,27 @@ function renderDisplayGroup(gridId, countId, set, type) {
   const grid    = document.getElementById(gridId);
   const countEl = document.getElementById(countId);
   if (!grid) return;
-
   if (countEl) countEl.textContent = `共 ${set.size} 項`;
-
   const cards = INVENTORY_CARDS.filter(c => set.has(c.id));
-
   if (cards.length === 0) {
-    grid.innerHTML = `
-      <div class="inv-display-empty" style="grid-column:1/-1">
-        <p>${type === 'strength' ? '尚未選擇強勢職能' : '尚未選擇劣勢職能'}</p>
-      </div>`;
+    grid.innerHTML = `<div class="inv-display-empty" style="grid-column:1/-1">
+      <p>${type === 'strength' ? '尚未選擇強勢職能' : '尚未選擇劣勢職能'}</p></div>`;
     return;
   }
-
   grid.innerHTML = cards.map(card => {
     const meta = getCategoryMeta(card.category);
-    return `
-      <div class="inv-display-card">
-        <div class="inv-display-card-head">
-          <span class="inv-category-badge"
-                style="background:${meta.bg};color:${meta.color}">${meta.label}</span>
-          <span class="inv-card-id">#${card.id}</span>
-        </div>
-        <div class="inv-display-card-title">${card.title}</div>
-        <ul class="inv-display-card-desc">${renderDescList(card.desc)}</ul>
-        <div class="inv-card-shadow" style="margin-top:auto">
-          <span class="inv-shadow-icon">🌑</span>
-          <span class="inv-shadow-text">${card.shadow}</span>
-        </div>
-      </div>`;
+    return `<div class="inv-display-card">
+      <div class="inv-display-card-head">
+        <span class="inv-category-badge" style="background:${meta.bg};color:${meta.color}">${meta.label}</span>
+        <span class="inv-card-id">#${card.id}</span>
+      </div>
+      <div class="inv-display-card-title">${card.title}</div>
+      <ul class="inv-display-card-desc">${renderDescList(card.desc)}</ul>
+      <div class="inv-card-shadow" style="margin-top:auto">
+        <span class="inv-shadow-icon">🌑</span>
+        <span class="inv-shadow-text">${card.shadow}</span>
+      </div>
+    </div>`;
   }).join('');
 }
 
@@ -501,16 +552,10 @@ function renderDisplayGroup(gridId, countId, set, type) {
 // ===================================================================
 
 function shareResult() {
-  if (strength.size === 0 && weakness.size === 0) {
-    showToast('請先選擇職能再分享！');
-    return;
-  }
+  if (strength.size === 0 && weakness.size === 0) { showToast('請先選擇職能再分享！'); return; }
   const url = buildShareURL();
-  navigator.clipboard.writeText(url).then(() => {
-    showToast('✅ 連結已複製到剪貼簿！');
-  }).catch(() => {
-    prompt('複製此連結：', url);
-  });
+  navigator.clipboard.writeText(url).then(() => showToast('✅ 連結已複製到剪貼簿！'))
+    .catch(() => prompt('複製此連結：', url));
 }
 
 // ===================================================================
@@ -519,9 +564,7 @@ function shareResult() {
 
 function resetAll() {
   if (!confirm('確定要重新開始嗎？目前所有選擇將會清除。')) return;
-  strength = new Set();
-  weakness = new Set();
-  currentIndex = 0;
+  strength = new Set(); weakness = new Set(); skipped = new Set(); currentIndex = 0;
   history.replaceState({}, '', location.pathname);
   document.getElementById('inv-complete-banner').style.display = 'none';
   switchMode('select');
@@ -536,8 +579,8 @@ const INV_INPUT_SLOTS = 7;
 function renderInputSlots() {
   renderInputGroup('inv-input-strength-grid', 'strength', INV_INPUT_SLOTS);
   renderInputGroup('inv-input-weakness-grid', 'weakness', INV_INPUT_SLOTS);
-  const resultBox = document.getElementById('inv-input-result-box');
-  if (resultBox) resultBox.classList.remove('visible');
+  const rb = document.getElementById('inv-input-result-box');
+  if (rb) rb.classList.remove('visible');
   document.getElementById('inv-input-error-summary').textContent = '';
 }
 
@@ -550,192 +593,113 @@ function renderInputGroup(gridId, type, count) {
     slot.className = 'input-slot';
     slot.innerHTML = `
       <div class="input-slot-label">編號 ${i + 1}</div>
-      <input type="number" class="input-slot-field"
-             id="inv-input-${type}-${i}"
-             min="1" max="60"
-             placeholder="–"
-             oninput="onInvSlotInput('${type}', ${i})">
+      <input type="number" class="input-slot-field" id="inv-input-${type}-${i}"
+             min="1" max="60" placeholder="–" oninput="onInvSlotInput('${type}', ${i})">
       <div class="input-slot-preview" id="inv-input-preview-${type}-${i}"></div>`;
     grid.appendChild(slot);
   }
 }
 
-function onInvSlotInput(type, slotIndex) {
-  const field   = document.getElementById(`inv-input-${type}-${slotIndex}`);
-  const preview = document.getElementById(`inv-input-preview-${type}-${slotIndex}`);
+function onInvSlotInput(type, idx) {
+  const field   = document.getElementById(`inv-input-${type}-${idx}`);
+  const preview = document.getElementById(`inv-input-preview-${type}-${idx}`);
   if (!field || !preview) return;
-
   const raw = field.value.trim();
-  if (raw === '') {
-    field.className = 'input-slot-field';
-    preview.className = 'input-slot-preview';
-    preview.textContent = '';
-    return;
-  }
-
+  if (raw === '') { field.className = 'input-slot-field'; preview.className = 'input-slot-preview'; preview.textContent = ''; return; }
   const num = parseInt(raw, 10);
-  if (isNaN(num) || num < 1) {
-    field.className = 'input-slot-field is-error';
-    preview.className = 'input-slot-preview preview-error';
-    preview.textContent = '請輸入正整數';
-    return;
-  }
-
+  if (isNaN(num) || num < 1) { _slotErr(field, preview, '請輸入正整數'); return; }
   const card = INVENTORY_CARDS.find(c => c.id === num);
-  if (!card) {
-    field.className = 'input-slot-field is-error';
-    preview.className = 'input-slot-preview preview-error';
-    preview.textContent = `找不到編號 ${num}`;
-    return;
-  }
-
-  if (checkInvDuplicate(type, slotIndex, num)) {
-    field.className = 'input-slot-field is-dup';
-    preview.className = 'input-slot-preview preview-dup';
-    preview.textContent = '重複的編號';
-    return;
-  }
-
+  if (!card) { _slotErr(field, preview, `找不到編號 ${num}`); return; }
+  if (checkInvDuplicate(type, idx, num)) { field.className = 'input-slot-field is-dup'; preview.className = 'input-slot-preview preview-dup'; preview.textContent = '重複的編號'; return; }
   field.className = 'input-slot-field is-valid';
   preview.className = 'input-slot-preview preview-name';
   preview.textContent = card.title;
-
   revalidateInvGroup(type);
 }
 
-function checkInvDuplicate(type, currentSlot, num) {
-  // Check within same type
+function _slotErr(f, p, msg) { f.className = 'input-slot-field is-error'; p.className = 'input-slot-preview preview-error'; p.textContent = msg; }
+
+function checkInvDuplicate(type, currentIdx, num) {
+  const other = type === 'strength' ? 'weakness' : 'strength';
   for (let i = 0; i < INV_INPUT_SLOTS; i++) {
-    if (i === currentSlot) continue;
-    const f = document.getElementById(`inv-input-${type}-${i}`);
-    if (!f || f.value.trim() === '') continue;
-    if (parseInt(f.value.trim(), 10) === num) return true;
-  }
-  // Check across other type (can't be in both strength and weakness)
-  const otherType = type === 'strength' ? 'weakness' : 'strength';
-  for (let i = 0; i < INV_INPUT_SLOTS; i++) {
-    const f = document.getElementById(`inv-input-${otherType}-${i}`);
-    if (!f || f.value.trim() === '') continue;
-    if (parseInt(f.value.trim(), 10) === num) return true;
+    if (i !== currentIdx) { const f = document.getElementById(`inv-input-${type}-${i}`); if (f && parseInt(f.value.trim(), 10) === num) return true; }
+    const f2 = document.getElementById(`inv-input-${other}-${i}`);
+    if (f2 && parseInt(f2.value.trim(), 10) === num) return true;
   }
   return false;
 }
 
 function revalidateInvGroup(type) {
   for (let i = 0; i < INV_INPUT_SLOTS; i++) {
-    const field = document.getElementById(`inv-input-${type}-${i}`);
-    if (!field || field.value.trim() === '') continue;
-    if (field.className.includes('is-valid') || field.className.includes('is-dup')) {
-      onInvSlotInput(type, i);
-    }
+    const f = document.getElementById(`inv-input-${type}-${i}`);
+    if (f && f.value.trim() && (f.className.includes('is-valid') || f.className.includes('is-dup'))) onInvSlotInput(type, i);
   }
 }
 
 function generateInputURL() {
-  const strIds  = [];
-  const weakIds = [];
-  const errors  = [];
-
-  const collectGroup = (type, ids) => {
+  const strIds = [], weakIds = [], errors = [];
+  const collect = (type, ids) => {
     for (let i = 0; i < INV_INPUT_SLOTS; i++) {
-      const field = document.getElementById(`inv-input-${type}-${i}`);
-      if (!field || field.value.trim() === '') continue;
-      const num = parseInt(field.value.trim(), 10);
-      if (isNaN(num) || num < 1) { errors.push(`${type === 'strength' ? '強勢' : '劣勢'} 第 ${i + 1} 格`); continue; }
+      const f = document.getElementById(`inv-input-${type}-${i}`);
+      if (!f || !f.value.trim()) continue;
+      const num = parseInt(f.value.trim(), 10);
+      const lbl = type === 'strength' ? '強勢' : '劣勢';
+      if (isNaN(num) || num < 1) { errors.push(`${lbl} 第${i+1}格`); continue; }
       const card = INVENTORY_CARDS.find(c => c.id === num);
-      if (!card) { errors.push(`${type === 'strength' ? '強勢' : '劣勢'} 第 ${i + 1} 格（編號 ${num} 不存在）`); continue; }
-      if (ids.includes(num)) { errors.push(`${type === 'strength' ? '強勢' : '劣勢'} 第 ${i + 1} 格（編號 ${num} 重複）`); continue; }
-      // Cross-type duplicate
-      const crossIds = type === 'strength' ? weakIds : strIds;
-      if (crossIds.includes(num)) { errors.push(`第 ${i + 1} 格編號 ${num} 同時出現在強勢與劣勢`); continue; }
+      if (!card) { errors.push(`${lbl} 第${i+1}格（編號${num}不存在）`); continue; }
+      const cross = type === 'strength' ? weakIds : strIds;
+      if (ids.includes(num) || cross.includes(num)) { errors.push(`${lbl} 第${i+1}格（重複）`); continue; }
       ids.push(num);
     }
   };
-
-  collectGroup('strength', strIds);
-  collectGroup('weakness', weakIds);
-
+  collect('strength', strIds); collect('weakness', weakIds);
   const summaryEl = document.getElementById('inv-input-error-summary');
-
-  if (errors.length > 0) {
-    summaryEl.textContent = `⚠️ 有錯誤：${errors.join('、')}，請修正後再試`;
-    return;
-  }
-
-  if (strIds.length === 0 && weakIds.length === 0) {
-    summaryEl.textContent = '⚠️ 請至少輸入一個職能編號';
-    return;
-  }
-
+  if (errors.length) { summaryEl.textContent = `⚠️ ${errors.join('、')} 有錯誤，請修正後再試`; return; }
+  if (!strIds.length && !weakIds.length) { summaryEl.textContent = '⚠️ 請至少輸入一個編號'; return; }
   summaryEl.textContent = '';
-
   const params = new URLSearchParams();
   if (strIds.length)  params.set('strength', strIds.join(','));
   if (weakIds.length) params.set('weakness', weakIds.join(','));
   const url = `${location.origin}${location.pathname}?${params.toString()}`;
-
-  const resultBox = document.getElementById('inv-input-result-box');
-  const urlEl     = document.getElementById('inv-input-result-url');
-  const namesEl   = document.getElementById('inv-input-result-names');
-
+  const rb = document.getElementById('inv-input-result-box');
+  const urlEl = document.getElementById('inv-input-result-url');
+  const namesEl = document.getElementById('inv-input-result-names');
   if (urlEl) urlEl.textContent = url;
-
   if (namesEl) {
-    const strCards  = strIds.map(id => INVENTORY_CARDS.find(c => c.id === id)).filter(Boolean);
+    const strCards  = strIds.map(id  => INVENTORY_CARDS.find(c => c.id === id)).filter(Boolean);
     const weakCards = weakIds.map(id => INVENTORY_CARDS.find(c => c.id === id)).filter(Boolean);
     let html = '';
-    if (strCards.length) {
-      html += `<div class="inv-result-group-label">💪 強勢：</div>`;
-      html += strCards.map(c =>
-        `<span class="occ-tag occ-tag-skill">${c.id} ${c.title}</span>`).join('');
-    }
-    if (weakCards.length) {
-      html += `<div class="inv-result-group-label" style="margin-top:6px">🌱 劣勢：</div>`;
-      html += weakCards.map(c =>
-        `<span class="occ-tag occ-tag-goal">${c.id} ${c.title}</span>`).join('');
-    }
+    if (strCards.length)  html += `<div class="inv-result-group-label">💪 強勢：</div>` + strCards.map(c => `<span class="occ-tag occ-tag-skill">${c.id} ${c.title}</span>`).join('');
+    if (weakCards.length) html += `<div class="inv-result-group-label" style="margin-top:6px">🌱 劣勢：</div>` + weakCards.map(c => `<span class="occ-tag occ-tag-goal">${c.id} ${c.title}</span>`).join('');
     namesEl.innerHTML = html;
   }
-
-  if (resultBox) resultBox.classList.add('visible');
+  if (rb) rb.classList.add('visible');
   window._invGeneratedURL = url;
 }
 
 function copyInputURL() {
   const url = window._invGeneratedURL;
   if (!url) return;
-  navigator.clipboard.writeText(url).then(() => {
-    showToast('✅ 連結已複製到剪貼簿！');
-  }).catch(() => {
-    prompt('複製此連結：', url);
-  });
+  navigator.clipboard.writeText(url).then(() => showToast('✅ 連結已複製到剪貼簿！')).catch(() => prompt('複製此連結：', url));
 }
 
-function clearInputPanel() {
-  renderInputSlots();
-}
+function clearInputPanel() { renderInputSlots(); }
 
 // ===================================================================
 // TOUCH / SWIPE
 // ===================================================================
 
-let _invTouchStartX = 0;
-let _invTouchStartY = 0;
+let _invTouchStartX = 0, _invTouchStartY = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
   const viewport = document.getElementById('inv-cards-viewport');
   if (!viewport) return;
-
   viewport.addEventListener('touchstart', e => {
-    _invTouchStartX = e.touches[0].clientX;
-    _invTouchStartY = e.touches[0].clientY;
+    _invTouchStartX = e.touches[0].clientX; _invTouchStartY = e.touches[0].clientY;
   }, { passive: true });
-
   viewport.addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - _invTouchStartX;
     const dy = e.changedTouches[0].clientY - _invTouchStartY;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-      if (dx < 0) nextCard(); else prevCard();
-    }
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) { if (dx < 0) nextCard(); else prevCard(); }
   }, { passive: true });
 });

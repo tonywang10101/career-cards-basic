@@ -38,6 +38,8 @@
               onclick="switchMode('select')">✏️ 選擇模式</button>
       <button class="mode-btn" id="mode-display-btn"
               onclick="switchMode('display')">📊 展示模式</button>
+      <button class="mode-btn" id="mode-spread-btn"
+              onclick="switchMode('spread')">🃏 排卡攤開</button>
       <button class="mode-btn" id="mode-input-btn"
               onclick="switchMode('input')">📋 快速輸入</button>
       <div class="mode-spacer"></div>
@@ -111,6 +113,34 @@
       </div>
 
     </div><!-- /inv-select-view -->
+
+    <!-- ===== SPREAD VIEW ===== -->
+    <div id="inv-spread-view" style="display:none;">
+
+      <!-- Summary chip strips -->
+      <div class="inv-chips-section" style="margin-bottom:20px">
+        <div class="inv-chip-row">
+          <span class="inv-chip-label strength-label">💪 強勢</span>
+          <div class="inv-chips-container" id="inv-spr-str-chips">
+            <span class="inv-chips-empty">尚未選擇</span>
+          </div>
+          <span class="inv-chip-count" id="inv-spr-str-count">0 / 7</span>
+        </div>
+        <div class="inv-chip-row">
+          <span class="inv-chip-label weakness-label">🌱 劣勢</span>
+          <div class="inv-chips-container" id="inv-spr-weak-chips">
+            <span class="inv-chips-empty">尚未選擇</span>
+          </div>
+          <span class="inv-chip-count" id="inv-spr-weak-count">0 / 7</span>
+        </div>
+      </div>
+
+      <!-- All cards grid -->
+      <div class="inv-spread-grid" id="inv-spread-grid">
+        <!-- injected by JS -->
+      </div>
+
+    </div><!-- /inv-spread-view -->
 
     <!-- ===== INPUT VIEW ===== -->
     <div id="inv-input-view" style="display:none;">

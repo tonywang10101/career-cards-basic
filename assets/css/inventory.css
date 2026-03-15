@@ -566,6 +566,131 @@
   font-size: 13px;
 }
 
+/* ---- Skip button ---- */
+.skip-btn {
+  flex: 0 0 auto !important;
+  padding: 8px 14px !important;
+  font-size: 13px !important;
+  color: var(--gray-400) !important;
+  border-color: var(--gray-200) !important;
+  background: white !important;
+}
+
+.skip-btn .inv-action-icon { font-size: 15px !important; }
+
+.skip-btn:hover {
+  border-color: var(--gray-400) !important;
+  color: var(--gray-600) !important;
+  background: var(--gray-50) !important;
+}
+
+.skip-btn.selected {
+  border-color: var(--gray-300) !important;
+  background: var(--gray-100) !important;
+  color: var(--gray-500) !important;
+}
+
+/* ---- Card skipped state ---- */
+.inv-card-inner.is-skipped {
+  border-color: var(--gray-200);
+  background: var(--gray-50);
+  opacity: .72;
+}
+
+.inv-card-inner.is-skipped .inv-card-status-ribbon {
+  opacity: 1;
+  color: var(--gray-500);
+  background: var(--gray-100);
+}
+
+/* ---- Carousel dot skipped state ---- */
+.inv-carousel-dot.is-skipped-dot {
+  background: var(--gray-200);
+  opacity: .5;
+}
+
+/* ---- Spread grid ---- */
+.inv-spread-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 28px 12px;
+  padding: 4px 2px 20px;
+}
+
+.inv-spr-wrap {
+  position: relative;
+  margin-top: 32px;
+}
+
+.inv-spr-actions {
+  position: absolute;
+  top: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 1;
+}
+
+.inv-spr-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-200);
+  background: white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  gap: 1px;
+  transition: all .15s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  color: var(--gray-500);
+  line-height: 1.2;
+}
+
+.inv-spr-btn span:first-child { font-size: 16px; }
+
+.spr-str-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.spr-str-btn.selected            { border-color: var(--primary); background: var(--primary); color: white; }
+.spr-weak-btn:hover:not(:disabled){ border-color: #F97316; color: #F97316; background: #FFF7ED; }
+.spr-weak-btn.selected           { border-color: #F97316; background: #F97316; color: white; }
+.inv-spr-btn:disabled            { opacity: .3; cursor: not-allowed; }
+
+.inv-spr-card {
+  background: white;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 9px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 72px;
+  transition: border-color .2s, background .2s;
+  cursor: default;
+}
+
+.inv-spr-card.spr-is-strength { border-color: var(--primary); background: var(--primary-light); }
+.inv-spr-card.spr-is-weakness { border-color: #F97316; background: #FFF7ED; }
+.inv-spr-card.spr-is-skipped  { border-color: var(--gray-200); background: var(--gray-50); opacity: .55; }
+
+.inv-spr-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--gray-800);
+  line-height: 1.35;
+}
+
+/* ---- Responsive spread ---- */
+@media (max-width: 768px) {
+  .inv-spread-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 28px 8px; }
+  .inv-spr-btn { width: 44px; height: 44px; font-size: 9px; }
+  .inv-spr-btn span:first-child { font-size: 13px; }
+}
+
 /* ---- Input panel ---- */
 .inv-input-panel {
   display: flex;

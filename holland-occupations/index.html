@@ -36,6 +36,8 @@
               onclick="switchMode('select')">✏️ 選擇模式</button>
       <button class="mode-btn" id="mode-display-btn"
               onclick="switchMode('display')">📊 展示模式</button>
+      <button class="mode-btn" id="mode-spread-btn"
+              onclick="switchMode('spread')">🃏 排卡攤開</button>
       <button class="mode-btn" id="mode-input-btn"
               onclick="switchMode('input')">📋 快速輸入</button>
       <div class="mode-spacer"></div>
@@ -97,6 +99,27 @@
       </div>
 
     </div><!-- /select-view -->
+
+    <!-- ===== SPREAD VIEW ===== -->
+    <div id="occ-spread-view" style="display:none;">
+
+      <!-- Liked chips summary -->
+      <div class="liked-strip" style="margin-bottom:20px">
+        <div class="liked-strip-header">
+          <span class="liked-strip-label">😊 已選喜歡</span>
+          <span class="liked-strip-count" id="occ-spr-liked-count">0 / 15</span>
+        </div>
+        <div class="liked-chips" id="occ-spr-liked-chips">
+          <span class="liked-chips-empty">尚未選擇喜歡的職業</span>
+        </div>
+      </div>
+
+      <!-- All cards grid -->
+      <div class="occ-spread-grid" id="occ-spread-grid">
+        <!-- injected by JS -->
+      </div>
+
+    </div><!-- /occ-spread-view -->
 
     <!-- ===== INPUT VIEW ===== -->
     <div id="input-view" style="display:none;">

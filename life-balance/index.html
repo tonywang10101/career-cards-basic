@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QTVW5DBYY2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QTVW5DBYY2');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生命平衡輪 – 生涯諮詢工具</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/life-balance.css">
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header">
+      <h2>生命平衡輪</h2>
+      <p>評估 10 個生命面向的滿意度，了解目前與理想狀態的差距。</p>
+    </div>
+
+    <!-- ===== MODE BAR ===== -->
+    <div class="mode-bar">
+      <button class="mode-btn active" id="lb-mode-wheel-btn"
+              onclick="switchLbMode('wheel')">🎡 雷達輪模式</button>
+      <button class="mode-btn" id="lb-mode-list-btn"
+              onclick="switchLbMode('list')">📋 列表模式</button>
+      <button class="mode-btn" id="lb-mode-display-btn"
+              onclick="switchLbMode('display')">📊 展示模式</button>
+      <button class="mode-btn" id="lb-mode-input-btn"
+              onclick="switchLbMode('input')">⌨️ 快速輸入</button>
+      <div class="mode-spacer"></div>
+      <button class="btn btn-outline" onclick="resetAll()">🔄 重新開始</button>
+      <button class="btn btn-primary" onclick="shareResult()">🔗 分享結果</button>
+    </div>
+
+    <!-- ===== EDIT TOGGLE (wheel + list modes) ===== -->
+    <div id="lb-edit-toggle-wrap" style="display:flex; justify-content:center; margin:12px 0 4px;">
+      <div class="lb-edit-toggle">
+        <button class="lb-toggle-btn active" id="lb-toggle-current"
+                onclick="setEditMode('current')">📍 目前滿意度</button>
+        <button class="lb-toggle-btn" id="lb-toggle-ideal"
+                onclick="setEditMode('ideal')">🌟 近期理想滿意度</button>
+      </div>
+    </div>
+
+    <!-- ===== WHEEL VIEW ===== -->
+    <div id="lb-wheel-view">
+      <div class="lb-wheel-container">
+        <svg id="lb-wheel-svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+    </div>
+
+    <!-- ===== LIST VIEW ===== -->
+    <div id="lb-list-view" style="display:none;">
+      <div class="lb-list-container" id="lb-list-body"></div>
+    </div>
+
+    <!-- ===== DISPLAY VIEW ===== -->
+    <div id="lb-display-view" style="display:none;">
+      <div class="lb-display-container">
+        <div class="lb-display-legend">
+          <div class="lb-legend-item">
+            <div class="lb-legend-line current"></div>
+            <span style="color:#4F46E5">目前滿意度</span>
+          </div>
+          <div class="lb-legend-item">
+            <div style="width:28px;height:2px;border-top:2.5px dashed #10B981;"></div>
+            <span style="color:#10B981">近期理想滿意度</span>
+          </div>
+        </div>
+        <svg id="lb-display-svg" viewBox="0 0 520 520" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="lb-display-table-wrap">
+          <table class="lb-display-table">
+            <thead>
+              <tr>
+                <th>面向</th>
+                <th style="color:#4F46E5">目前</th>
+                <th style="color:#10B981">理想</th>
+                <th>落差</th>
+              </tr>
+            </thead>
+            <tbody id="lb-display-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== INPUT VIEW ===== -->
+    <div id="lb-input-view" style="display:none;">
+      <div class="lb-input-panel">
+        <div class="lb-input-panel-intro">
+          <strong>諮詢師快速輸入工具：</strong>
+          請輸入每個面向的分數（0–10），系統將同步到其他模式。
+        </div>
+        <div class="lb-input-grid" id="lb-input-grid">
+          <!-- injected by JS -->
+        </div>
+        <div class="lb-input-actions">
+          <button class="btn btn-primary" onclick="generateLbURL()">🔗 產生連結</button>
+          <button class="btn btn-outline" onclick="clearLbInput()">✕ 清除</button>
+        </div>
+        <div class="lb-input-result-box" id="lb-input-result-box" style="display:none;">
+          <div class="lb-input-result-label">已產生的分享連結</div>
+          <div class="lb-input-result-url" id="lb-input-result-url"></div>
+          <button class="btn btn-primary" onclick="copyLbInputURL()">📋 複製連結</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="footer">
+  <p>此頁內容參照 © 2026 職游創新職涯發展與諮詢：職涯助人者的成長導航！所發行之「生命平衡輪」，如需商業使用，請洽光徑股份有限公司．統一編號: 91077870</p>
+</div>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/life-balance.js"></script>
+<script>
+  initNav('life-balance', '../');
+  initLifeBalance();
+</script>
+</body>
+</html>

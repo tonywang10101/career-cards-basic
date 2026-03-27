@@ -191,6 +191,7 @@ function switchMode(mode) {
     const btn = document.getElementById('mode-input-btn');
     if (el) el.style.display = ''; if (btn) btn.classList.add('active');
     renderInputSlots();
+    _fillOccSlotsFromState();
   } else {
     const el = document.getElementById('display-view');
     const btn = document.getElementById('mode-display-btn');
@@ -592,6 +593,8 @@ function renderInputSlots() {
   document.getElementById('input-error-summary').textContent = '';
 }
 
+let _occRevalidating = false;
+
 function onSlotInput(slotIndex) {
   const field   = document.getElementById(`input-slot-${slotIndex}`);
   const preview = document.getElementById(`input-slot-preview-${slotIndex}`);
@@ -602,6 +605,7 @@ function onSlotInput(slotIndex) {
     field.className = 'input-slot-field';
     preview.className = 'input-slot-preview';
     preview.textContent = '';
+    _applyOccInputToState();
     return;
   }
 
@@ -610,6 +614,7 @@ function onSlotInput(slotIndex) {
     field.className = 'input-slot-field is-error';
     preview.className = 'input-slot-preview preview-error';
     preview.textContent = '請輸入正整數';
+    _applyOccInputToState();
     return;
   }
 
@@ -618,6 +623,7 @@ function onSlotInput(slotIndex) {
     field.className = 'input-slot-field is-error';
     preview.className = 'input-slot-preview preview-error';
     preview.textContent = `找不到編號 ${num}`;
+    _applyOccInputToState();
     return;
   }
 
@@ -627,6 +633,7 @@ function onSlotInput(slotIndex) {
     field.className = 'input-slot-field is-dup';
     preview.className = 'input-slot-preview preview-dup';
     preview.textContent = '重複的編號';
+    _applyOccInputToState();
     return;
   }
 
@@ -634,8 +641,13 @@ function onSlotInput(slotIndex) {
   preview.className = 'input-slot-preview preview-name';
   preview.textContent = occ.name;
 
-  // Re-validate other slots that might now be un-duplicated
-  revalidateAllSlots();
+  // Re-validate other slots (guarded against infinite recursion)
+  if (!_occRevalidating) {
+    _occRevalidating = true;
+    revalidateAllSlots();
+    _occRevalidating = false;
+  }
+  _applyOccInputToState();
 }
 
 function checkDuplicate(currentSlot, num) {
@@ -661,44 +673,21 @@ function revalidateAllSlots() {
 }
 
 function generateInputURL() {
-  const ids    = [];
-  const errors = [];
-
-  for (let i = 0; i < INPUT_SLOTS; i++) {
-    const field = document.getElementById(`input-slot-${i}`);
-    if (!field || field.value.trim() === '') continue;
-
-    const num = parseInt(field.value.trim(), 10);
-    if (isNaN(num) || num < 1) { errors.push(`第 ${i + 1} 格`); continue; }
-
-    const occ = OCCUPATIONS.find(o => o.id === num);
-    if (!occ) { errors.push(`第 ${i + 1} 格（編號 ${num} 不存在）`); continue; }
-    if (ids.includes(num)) { errors.push(`第 ${i + 1} 格（編號 ${num} 重複）`); continue; }
-    ids.push(num);
-  }
-
   const summaryEl = document.getElementById('input-error-summary');
-
-  if (errors.length > 0) {
-    summaryEl.textContent = `⚠️ 有錯誤：${errors.join('、')}，請修正後再試`;
-    return;
-  }
-
-  if (ids.length === 0) {
+  if (liked.size === 0) {
     summaryEl.textContent = '⚠️ 請至少輸入一個職業編號';
     return;
   }
-
   summaryEl.textContent = '';
 
+  const ids    = [...liked];
   const params = new URLSearchParams();
   params.set('like', ids.join(','));
-  // Build URL pointing to this page
   const url = `${location.origin}${location.pathname}?${params.toString()}`;
 
-  const resultBox   = document.getElementById('input-result-box');
-  const urlEl       = document.getElementById('input-result-url');
-  const namesEl     = document.getElementById('input-result-names');
+  const resultBox = document.getElementById('input-result-box');
+  const urlEl     = document.getElementById('input-result-url');
+  const namesEl   = document.getElementById('input-result-names');
 
   if (urlEl)  urlEl.textContent = url;
   if (namesEl) {
@@ -708,8 +697,6 @@ function generateInputURL() {
     ).join('');
   }
   if (resultBox) resultBox.classList.add('visible');
-
-  // Store URL for copy
   window._inputGeneratedURL = url;
 }
 
@@ -724,7 +711,48 @@ function copyInputURL() {
 }
 
 function clearInputPanel() {
+  liked    = new Set();
+  disliked = new Set();
+  currentIndex = 0;
   renderInputSlots();
+  renderCards(); renderDots(); updateStatusBar(); renderChips();
+  const rb = document.getElementById('input-result-box');
+  if (rb) rb.classList.remove('visible');
+  document.getElementById('input-error-summary').textContent = '';
+}
+
+// ===================================================================
+// INPUT ↔ STATE SYNC
+// ===================================================================
+
+// Read all is-valid slots → rebuild liked Set → re-render other views.
+function _applyOccInputToState() {
+  const newLiked = new Set();
+  for (let i = 0; i < INPUT_SLOTS; i++) {
+    const f = document.getElementById(`input-slot-${i}`);
+    if (f && f.classList.contains('is-valid')) {
+      const id = parseInt(f.value, 10);
+      if (!isNaN(id)) newLiked.add(id);
+    }
+  }
+  liked = newLiked;
+  liked.forEach(id => disliked.delete(id)); // can't be both
+  renderCards(); renderDots(); updateStatusBar(); renderChips();
+}
+
+// Pre-fill slots from current liked Set (called when entering input mode).
+function _fillOccSlotsFromState() {
+  const likedArr = [...liked];
+  for (let i = 0; i < INPUT_SLOTS; i++) {
+    const field   = document.getElementById(`input-slot-${i}`);
+    const preview = document.getElementById(`input-slot-preview-${i}`);
+    if (!field || !preview) continue;
+    if (i < likedArr.length) {
+      field.value = likedArr[i];
+      onSlotInput(i);
+    }
+    // empty slots already blank from renderInputSlots()
+  }
 }
 
 // ===================================================================

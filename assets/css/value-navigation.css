@@ -1,0 +1,560 @@
+/* ============================================================
+   value-navigation.css  –  價值導航卡
+   ============================================================ */
+
+/* ===== CATEGORY COLOUR TOKENS ===== */
+.cat-pink  { --cat-bg: #FDF2F8; --cat-border: #F9A8D4; --cat-text: #BE185D; }
+.cat-teal  { --cat-bg: #F0FDFA; --cat-border: #5EEAD4; --cat-text: #0F766E; }
+.cat-amber { --cat-bg: #FFFBEB; --cat-border: #FCD34D; --cat-text: #B45309; }
+.cat-blue  { --cat-bg: #EFF6FF; --cat-border: #93C5FD; --cat-text: #1D4ED8; }
+
+/* ===== FILTER BAR ===== */
+.val-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: var(--gray-50, #F9FAFB);
+  border: 1px solid var(--gray-200, #E5E7EB);
+  border-radius: var(--radius, 12px);
+}
+
+.val-submode-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.val-sub-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border: 1.5px solid var(--gray-300, #D1D5DB);
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-600, #4B5563);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.val-sub-btn.active {
+  border-color: var(--primary, #4F46E5);
+  background: var(--primary, #4F46E5);
+  color: white;
+}
+.val-sub-btn:hover:not(.active) {
+  border-color: var(--primary, #4F46E5);
+  color: var(--primary, #4F46E5);
+}
+
+/* Category tabs */
+.val-cat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.val-cat-tab {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--cat-border);
+  background: var(--cat-bg);
+  color: var(--cat-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  opacity: 0.7;
+}
+.val-cat-tab.active,
+.val-cat-tab:hover {
+  opacity: 1;
+  box-shadow: 0 0 0 2px var(--cat-border);
+}
+.val-cat-tab.active {
+  font-weight: 700;
+}
+
+/* ===== STATUS BAR ===== */
+.val-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.val-counter-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: var(--primary-light, #EEF2FF);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary, #4F46E5);
+  white-space: nowrap;
+}
+.val-counter-badge .badge-num { font-size: 18px; }
+
+.val-progress-wrap {
+  flex: 1;
+  min-width: 140px;
+}
+.val-progress-label {
+  font-size: 12px;
+  color: var(--gray-500, #6B7280);
+  margin-bottom: 4px;
+}
+.val-progress-bar {
+  height: 6px;
+  background: var(--gray-200, #E5E7EB);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.val-progress-fill {
+  height: 100%;
+  background: var(--primary, #4F46E5);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.val-remaining-text {
+  font-size: 12px;
+  color: var(--gray-500, #6B7280);
+  white-space: nowrap;
+}
+
+/* Complete banner */
+.val-complete-banner {
+  background: linear-gradient(135deg, #EEF2FF 0%, #F0FDF4 100%);
+  border: 1.5px solid #A5B4FC;
+  border-radius: var(--radius, 12px);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.val-complete-banner h3 { margin: 0 0 6px; font-size: 18px; }
+.val-complete-banner p  { margin: 0; font-size: 14px; color: var(--gray-600, #4B5563); }
+
+/* ===== CAROUSEL ===== */
+.val-cards-viewport {
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius, 12px);
+}
+
+.val-cards-track {
+  display: flex;
+  gap: 0;
+}
+
+.val-card-slide {
+  min-width: 100%;
+  display: none;
+}
+.val-card-slide.active { display: block; }
+
+.val-card-inner {
+  background: white;
+  border: 2px solid var(--gray-200, #E5E7EB);
+  border-radius: var(--radius, 12px);
+  padding: 28px 24px 20px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transition: border-color 0.2s, background 0.2s;
+}
+.val-card-inner.is-liked {
+  border-color: #10B981;
+  background: #F0FDF4;
+}
+.val-card-inner.is-disliked {
+  border-color: var(--gray-300, #D1D5DB);
+  background: var(--gray-50, #F9FAFB);
+  opacity: 0.75;
+}
+
+.val-card-num {
+  font-size: 11px;
+  color: var(--gray-400, #9CA3AF);
+  font-weight: 500;
+  align-self: flex-end;
+  margin-bottom: -6px;
+}
+
+.val-card-cat-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--cat-border);
+  background: var(--cat-bg);
+  color: var(--cat-text);
+}
+
+.val-card-text {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gray-800, #1F2937);
+  line-height: 1.4;
+}
+
+/* Card action buttons – circular emoji style */
+.val-card-actions {
+  display: flex;
+  gap: 32px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.val-btn {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  border: 2.5px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  background: white;
+  padding: 0;
+}
+.val-btn:hover:not(:disabled) {
+  transform: scale(1.07);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+}
+.val-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.val-btn-emoji {
+  font-size: 26px;
+  line-height: 1;
+}
+.val-btn-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* 認同 – green */
+.val-like-btn {
+  border-color: #34D399;
+  background: #F0FDF9;
+  color: #065F46;
+}
+.val-like-btn:hover:not(:disabled) {
+  background: #D1FAE5;
+}
+.val-like-btn.selected {
+  background: #A7F3D0;
+  border-color: #10B981;
+  color: #065F46;
+}
+.val-like-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 不認同 – pink/red */
+.val-dislike-btn {
+  border-color: #FCA5A5;
+  background: #FFF5F5;
+  color: #991B1B;
+}
+.val-dislike-btn:hover {
+  background: #FEE2E2;
+}
+.val-dislike-btn.selected {
+  background: #FECACA;
+  border-color: #EF4444;
+  color: #991B1B;
+}
+
+/* Carousel nav */
+.val-carousel-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.val-arrow-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-300, #D1D5DB);
+  background: white;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--gray-600, #4B5563);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.val-arrow-btn:hover:not(:disabled) {
+  border-color: var(--primary, #4F46E5);
+  color: var(--primary, #4F46E5);
+}
+.val-arrow-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.val-dots-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  max-width: 340px;
+}
+
+.val-carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gray-300, #D1D5DB);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.val-carousel-dot.active       { transform: scale(1.4); background: var(--primary, #4F46E5); }
+.val-carousel-dot.is-liked-dot { background: #10B981; }
+.val-carousel-dot.is-disliked-dot { background: var(--gray-400, #9CA3AF); }
+
+/* ===== CHIPS ===== */
+.val-chips-section {
+  background: white;
+  border: 1.5px solid var(--gray-200, #E5E7EB);
+  border-radius: var(--radius, 12px);
+  padding: 14px 16px;
+}
+
+.val-chip-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.val-chip-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-700, #374151);
+  white-space: nowrap;
+  padding-top: 2px;
+}
+
+.val-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+}
+
+.val-chips-empty {
+  font-size: 13px;
+  color: var(--gray-400, #9CA3AF);
+  font-style: italic;
+}
+
+.val-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--cat-border);
+  background: var(--cat-bg);
+  color: var(--cat-text);
+  transition: opacity 0.15s;
+}
+.val-chip:hover { opacity: 0.7; }
+
+.val-chip-count {
+  font-size: 12px;
+  color: var(--gray-500, #6B7280);
+  white-space: nowrap;
+  padding-top: 3px;
+}
+
+/* ===== SPREAD VIEW ===== */
+.val-spread-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 28px 10px;
+  margin-top: 8px;
+}
+
+.val-spr-wrap {
+  position: relative;
+  margin-top: 32px;
+}
+
+.val-spr-actions {
+  position: absolute;
+  top: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 1;
+}
+
+.val-spr-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  background: white;
+}
+
+.spr-like-btn {
+  border-color: #10B981;
+  color: #10B981;
+}
+.spr-like-btn:hover:not(:disabled) {
+  background: #10B981;
+  color: white;
+}
+.spr-like-btn.selected {
+  background: #10B981;
+  color: white;
+  border-color: #10B981;
+}
+.spr-like-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.spr-dislike-btn {
+  border-color: var(--gray-300, #D1D5DB);
+  color: var(--gray-500, #6B7280);
+}
+.spr-dislike-btn:hover {
+  background: var(--gray-100, #F3F4F6);
+}
+.spr-dislike-btn.selected {
+  background: var(--gray-200, #E5E7EB);
+  border-color: var(--gray-400, #9CA3AF);
+}
+
+.val-spr-card {
+  background: white;
+  border: 2px solid var(--gray-200, #E5E7EB);
+  border-radius: 10px;
+  padding: 10px 8px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.val-spr-card.spr-is-liked {
+  border-color: #10B981;
+  background: #F0FDF4;
+}
+.val-spr-card.spr-is-disliked {
+  border-color: var(--gray-300, #D1D5DB);
+  background: var(--gray-50, #F9FAFB);
+  opacity: 0.65;
+}
+
+.val-spr-num {
+  font-size: 10px;
+  color: var(--gray-400, #9CA3AF);
+  align-self: flex-end;
+}
+
+.val-spr-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-800, #1F2937);
+  line-height: 1.4;
+}
+
+/* ===== DISPLAY VIEW ===== */
+.val-display-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.val-display-header h3 {
+  font-size: 18px;
+  margin: 0;
+}
+.val-display-liked-count {
+  font-size: 14px;
+  color: var(--gray-500, #6B7280);
+}
+
+.val-display-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.val-display-card {
+  background: white;
+  border: 2px solid var(--gray-200, #E5E7EB);
+  border-radius: 10px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.val-display-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-800, #1F2937);
+  line-height: 1.4;
+}
+
+.val-empty-hint {
+  color: var(--gray-400, #9CA3AF);
+  font-style: italic;
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* ===== INPUT PANEL ===== */
+.val-input-panel {
+  background: white;
+  border: 1.5px solid var(--gray-200, #E5E7EB);
+  border-radius: var(--radius, 12px);
+  padding: 20px 20px 24px;
+}
+
+.val-input-panel-intro {
+  font-size: 13px;
+  color: var(--gray-600, #4B5563);
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 640px) {
+  .val-card-text { font-size: 18px; }
+  .val-spread-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+  .val-display-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  .val-submode-toggle { flex-direction: column; }
+}

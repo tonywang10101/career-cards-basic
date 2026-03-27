@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QTVW5DBYY2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QTVW5DBYY2');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>價值導航卡 – 生涯諮詢工具</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/value-navigation.css">
+  <link rel="stylesheet" href="../assets/css/occupations.css"><!-- reuse input-slot styles -->
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header">
+      <h2>價值導航卡</h2>
+      <p>瀏覽 70 張價值卡片，選出認同的個人價值，深入了解自己的核心驅動力。</p>
+    </div>
+
+    <!-- ===== MODE BAR ===== -->
+    <div class="mode-bar">
+      <button class="mode-btn active" id="mode-select-btn"
+              onclick="switchMode('select')">✏️ 選擇模式</button>
+      <button class="mode-btn" id="mode-spread-btn"
+              onclick="switchMode('spread')">🃏 攤開選擇</button>
+      <button class="mode-btn" id="mode-display-btn"
+              onclick="switchMode('display')">📊 展示模式</button>
+      <button class="mode-btn" id="mode-input-btn"
+              onclick="switchMode('input')">📋 快速輸入</button>
+      <div class="mode-spacer"></div>
+      <button class="btn btn-outline" onclick="resetAll()">🔄 重新開始</button>
+      <button class="btn btn-primary" onclick="shareResult()">🔗 分享結果</button>
+    </div>
+
+    <!-- ===== FILTER BAR (visible in select / spread modes) ===== -->
+    <div class="val-filter-bar" id="val-filter-bar">
+      <div class="val-submode-toggle">
+        <button class="val-sub-btn active" id="val-sub-all"
+                onclick="setValSubMode('all')">🌐 全部分類（選 15）</button>
+        <button class="val-sub-btn" id="val-sub-cat"
+                onclick="setValSubMode('cat')">🗂️ 特定分類（選 10）</button>
+      </div>
+      <div class="val-cat-tabs" id="val-cat-tabs" style="display:none;"></div>
+    </div>
+
+    <!-- ===== SELECT VIEW ===== -->
+    <div id="val-select-view">
+
+      <!-- Status bar -->
+      <div class="val-status-bar">
+        <div class="val-counter-badge" id="val-liked-counter">
+          <span class="badge-num">0</span>
+          <span class="val-max-label">/ 15 已選認同</span>
+        </div>
+        <div class="val-progress-wrap">
+          <div class="val-progress-label" id="val-progress-label">已評估 0 / 70 張</div>
+          <div class="val-progress-bar">
+            <div class="val-progress-fill" id="val-progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="val-remaining-text" id="val-remaining-text">還有 70 張未評估</div>
+      </div>
+
+      <!-- Complete banner -->
+      <div class="val-complete-banner" id="val-complete-banner" style="display:none;">
+        <h3>🎉 所有卡片評估完畢！</h3>
+        <p>切換到「展示模式」查看結果，或點「分享結果」產生連結。</p>
+      </div>
+
+      <!-- Carousel -->
+      <div class="val-cards-viewport" id="val-cards-viewport">
+        <div class="val-cards-track" id="val-cards-track">
+          <!-- cards injected by JS -->
+        </div>
+      </div>
+
+      <!-- Carousel nav -->
+      <div class="val-carousel-nav">
+        <button class="val-arrow-btn" id="val-prev-btn" onclick="prevCard()">◀</button>
+        <div class="val-dots-wrap" id="val-carousel-dots"></div>
+        <button class="val-arrow-btn" id="val-next-btn" onclick="nextCard()">▶</button>
+      </div>
+
+      <!-- Liked chips -->
+      <div class="val-chips-section">
+        <div class="val-chip-row">
+          <span class="val-chip-label">💎 已選認同</span>
+          <div class="val-chips-container" id="val-liked-chips">
+            <span class="val-chips-empty">尚未選擇</span>
+          </div>
+          <span class="val-chip-count" id="val-chips-count">0 / 15</span>
+        </div>
+      </div>
+
+    </div><!-- /val-select-view -->
+
+    <!-- ===== SPREAD VIEW ===== -->
+    <div id="val-spread-view" style="display:none;">
+
+      <!-- Summary chips -->
+      <div class="val-chips-section" style="margin-bottom:20px">
+        <div class="val-chip-row">
+          <span class="val-chip-label">💎 已選認同</span>
+          <div class="val-chips-container" id="val-spr-liked-chips">
+            <span class="val-chips-empty">尚未選擇</span>
+          </div>
+          <span class="val-chip-count" id="val-spr-liked-count">0 / 15</span>
+        </div>
+      </div>
+
+      <!-- All cards grid -->
+      <div class="val-spread-grid" id="val-spread-grid">
+        <!-- injected by JS -->
+      </div>
+
+    </div><!-- /val-spread-view -->
+
+    <!-- ===== INPUT VIEW ===== -->
+    <div id="val-input-view" style="display:none;">
+      <div class="val-input-panel">
+
+        <div class="val-input-panel-intro">
+          <strong>諮詢師快速輸入工具：</strong>
+          請輸入最多 <strong id="val-input-intro-count">15</strong> 個認同的價值編號（參考選擇模式中卡片右上角的 # 編號），系統將自動驗證並產生分享連結。
+        </div>
+
+        <div class="input-slots-grid" id="val-input-slots-grid">
+          <!-- slots injected by JS -->
+        </div>
+
+        <div class="input-actions">
+          <button class="btn btn-primary" onclick="generateInputURL()">🔗 產生連結</button>
+          <button class="btn btn-outline" onclick="clearInputPanel()">✕ 清除</button>
+          <span class="input-error-summary" id="val-input-error-summary"></span>
+        </div>
+
+        <div class="input-result-box" id="val-input-result-box" style="display:none;">
+          <div class="input-result-label">已產生的分享連結</div>
+          <div class="input-result-url" id="val-input-result-url"></div>
+          <div class="input-result-names" id="val-input-result-names"></div>
+          <button class="btn btn-primary" onclick="copyInputURL()">📋 複製連結</button>
+        </div>
+
+      </div>
+    </div><!-- /val-input-view -->
+
+    <!-- ===== DISPLAY VIEW ===== -->
+    <div id="val-display-view" style="display:none;">
+      <div class="val-display-header">
+        <h3>認同的價值</h3>
+        <span class="val-display-liked-count" id="val-display-liked-count">共 0 個價值</span>
+      </div>
+      <div class="val-display-grid" id="val-display-grid">
+        <!-- cards injected by JS -->
+      </div>
+    </div><!-- /val-display-view -->
+
+  </main>
+</div><!-- /app-shell -->
+
+<div class="toast" id="toast"></div>
+
+<div class="footer">
+  <p>此頁內容參照 © 2026 職游創新職涯發展與諮詢：職涯助人者的成長導航！所發行之「價值導航卡」，如需商業使用，請洽光徑股份有限公司．統一編號: 91077870 </p>
+</div>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/value-navigation.js"></script>
+<script>
+  initNav('value-navigation', '../');
+  initValueNavigation();
+</script>
+</body>
+</html>

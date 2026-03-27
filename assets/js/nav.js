@@ -19,7 +19,8 @@ const NAV_ITEMS = [
     items: [
       { key: 'holland-basic',       icon: '🎯', label: '旅人卡 - 何倫碼',   href: 'holland-basic/index.html' },
       { key: 'holland-occupations', icon: '💼', label: '旅人卡 - 職業偏好',     href: 'holland-occupations/index.html' },
-      { key: 'inventory',           icon: '🧩', label: '職能盤點卡',             href: 'inventory/index.html' }
+      { key: 'inventory',           icon: '🧩', label: '職能盤點卡',             href: 'inventory/index.html' },
+      { key: 'value-navigation',    icon: '💎', label: '價值導航卡',               href: 'value-navigation/index.html' }
     ]
   }
 ];

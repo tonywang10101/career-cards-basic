@@ -147,6 +147,7 @@ function switchMode(mode) {
   } else if (mode === 'input') {
     _show('inv-input-view');   _active('mode-input-btn');
     renderInputSlots();
+    _fillSlotsFromState();
   } else {
     _show('inv-display-view'); _active('mode-display-btn');
     renderDisplay();
@@ -600,21 +601,30 @@ function renderInputGroup(gridId, type, count) {
   }
 }
 
+let _invRevalidating = false;
+
 function onInvSlotInput(type, idx) {
   const field   = document.getElementById(`inv-input-${type}-${idx}`);
   const preview = document.getElementById(`inv-input-preview-${type}-${idx}`);
   if (!field || !preview) return;
   const raw = field.value.trim();
-  if (raw === '') { field.className = 'input-slot-field'; preview.className = 'input-slot-preview'; preview.textContent = ''; return; }
+  if (raw === '') { field.className = 'input-slot-field'; preview.className = 'input-slot-preview'; preview.textContent = ''; _applyInputToState(); return; }
   const num = parseInt(raw, 10);
   if (isNaN(num) || num < 1) { _slotErr(field, preview, '請輸入正整數'); return; }
   const card = INVENTORY_CARDS.find(c => c.id === num);
   if (!card) { _slotErr(field, preview, `找不到編號 ${num}`); return; }
-  if (checkInvDuplicate(type, idx, num)) { field.className = 'input-slot-field is-dup'; preview.className = 'input-slot-preview preview-dup'; preview.textContent = '重複的編號'; return; }
+  if (checkInvDuplicate(type, idx, num)) { field.className = 'input-slot-field is-dup'; preview.className = 'input-slot-preview preview-dup'; preview.textContent = '重複的編號'; _applyInputToState(); return; }
   field.className = 'input-slot-field is-valid';
   preview.className = 'input-slot-preview preview-name';
   preview.textContent = card.title;
-  revalidateInvGroup(type);
+  // Revalidate sibling slots (e.g. un-dup a slot whose partner just changed),
+  // guarded to prevent infinite recursion
+  if (!_invRevalidating) {
+    _invRevalidating = true;
+    revalidateInvGroup(type);
+    _invRevalidating = false;
+  }
+  _applyInputToState();
 }
 
 function _slotErr(f, p, msg) { f.className = 'input-slot-field is-error'; p.className = 'input-slot-preview preview-error'; p.textContent = msg; }
@@ -683,7 +693,63 @@ function copyInputURL() {
   navigator.clipboard.writeText(url).then(() => showToast('✅ 連結已複製到剪貼簿！')).catch(() => prompt('複製此連結：', url));
 }
 
-function clearInputPanel() { renderInputSlots(); }
+function clearInputPanel() {
+  strength = new Set();
+  weakness = new Set();
+  skipped.clear();
+  currentIndex = 0;
+  renderInputSlots();
+  // Sync cleared state to other views
+  renderCards(); renderDots(); updateStatusBar(); renderChips();
+}
+
+// ===================================================================
+// INPUT ↔ STATE SYNC
+// ===================================================================
+
+// Read every input slot and rebuild strength/weakness from valid entries,
+// then re-render select / spread / display views silently.
+function _applyInputToState() {
+  const newStr  = new Set();
+  const newWeak = new Set();
+  for (let i = 0; i < INV_INPUT_SLOTS; i++) {
+    const sf = document.getElementById(`inv-input-strength-${i}`);
+    const wf = document.getElementById(`inv-input-weakness-${i}`);
+    if (sf && sf.classList.contains('is-valid')) {
+      const n = parseInt(sf.value.trim(), 10);
+      if (!isNaN(n)) newStr.add(n);
+    }
+    if (wf && wf.classList.contains('is-valid')) {
+      const n = parseInt(wf.value.trim(), 10);
+      if (!isNaN(n)) newWeak.add(n);
+    }
+  }
+  strength = newStr;
+  weakness = newWeak;
+  renderCards();
+  renderDots();
+  updateStatusBar();
+  renderChips();
+}
+
+// Pre-fill the input slots from the current strength/weakness Sets
+// (called when switching into input mode with existing state).
+function _fillSlotsFromState() {
+  const strArr  = [...strength];
+  const weakArr = [...weakness];
+  for (let i = 0; i < INV_INPUT_SLOTS; i++) {
+    const sf = document.getElementById(`inv-input-strength-${i}`);
+    const wf = document.getElementById(`inv-input-weakness-${i}`);
+    if (sf) {
+      sf.value = i < strArr.length ? strArr[i] : '';
+      onInvSlotInput('strength', i);
+    }
+    if (wf) {
+      wf.value = i < weakArr.length ? weakArr[i] : '';
+      onInvSlotInput('weakness', i);
+    }
+  }
+}
 
 // ===================================================================
 // TOUCH / SWIPE

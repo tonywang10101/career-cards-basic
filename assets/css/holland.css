@@ -1,28 +1,6 @@
 /* ===== HOLLAND CODE – PAGE STYLES ===== */
 
-/* Mode bar */
-.mode-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
-
-.mode-btn {
-  padding: 8px 18px;
-  border-radius: 999px;
-  border: 2px solid var(--gray-200);
-  background: white;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--gray-600);
-  cursor: pointer;
-  transition: all .15s;
-}
-.mode-btn:hover      { border-color: var(--primary); color: var(--primary); }
-.mode-btn.active     { background: var(--primary); border-color: var(--primary); color: white; }
-.mode-spacer         { flex: 1; }
+/* Mode bar → see main.css */
 
 /* Progress */
 .sort-progress {

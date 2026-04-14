@@ -568,7 +568,7 @@ function resetAll() {
 // QUICK-INPUT PANEL  (counselor tool)
 // ===================================================================
 
-const INPUT_SLOTS = 12;
+const INPUT_SLOTS = 15;
 
 function renderInputSlots() {
   const grid = document.getElementById('input-slots-grid');

@@ -622,7 +622,7 @@ function renderInputSlots() {
 
   // Hide result box on re-render (slot count may have changed)
   const resultBox = document.getElementById('val-input-result-box');
-  if (resultBox) resultBox.style.display = 'none';
+  if (resultBox) resultBox.classList.remove('visible');
   const errEl = document.getElementById('val-input-error-summary');
   if (errEl) errEl.textContent = '';
 }
@@ -730,7 +730,7 @@ function generateInputURL() {
   const resultUrl  = document.getElementById('val-input-result-url');
   const resultNames = document.getElementById('val-input-result-names');
 
-  if (resultBox)   resultBox.style.display = '';
+  if (resultBox)   resultBox.classList.add('visible');
   if (resultUrl)   resultUrl.textContent   = url;
   if (resultNames) resultNames.innerHTML   = [...liked].map(id => {
     const c = cardById(id);
@@ -755,7 +755,7 @@ function clearInputPanel() {
   renderChips();
   updateStatusBar();
   const resultBox = document.getElementById('val-input-result-box');
-  if (resultBox) resultBox.style.display = 'none';
+  if (resultBox) resultBox.classList.remove('visible');
   const errEl = document.getElementById('val-input-error-summary');
   if (errEl) errEl.textContent = '';
 }

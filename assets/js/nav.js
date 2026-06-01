@@ -22,7 +22,8 @@ const NAV_ITEMS = [
       { key: 'inventory',           icon: '🧩', label: '職能盤點卡',             href: 'inventory/index.html' },
       { key: 'value-navigation',    icon: '💎', label: '價值導航卡',               href: 'value-navigation/index.html' },
       { key: 'life-balance',        icon: '⚖️', label: '生命平衡輪',               href: 'life-balance/index.html' },
-      { key: 'decision-space-worksheet', icon: '🫧', label: '決策空間工作表',      href: 'decision-space-worksheet/index.html' }
+      { key: 'decision-space-worksheet', icon: '🫧', label: '決策空間工作表',      href: 'decision-space-worksheet/index.html' },
+      { key: 'three-triangles-map', icon: '△', label: '職涯三角地圖',             href: 'three-triangles-map/index.html' }
     ]
   }
 ];

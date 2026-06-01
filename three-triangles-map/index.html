@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QTVW5DBYY2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QTVW5DBYY2');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>職涯三角地圖 – 生涯諮詢工具</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/three-triangles-map.css">
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h2>職涯三角地圖</h2>
+      <p>三個三角形的動態動生涯地圖，三角型皆會持續變動，需要不時重新評估和轉換</p>
+    </div>
+
+    <div class="mode-bar">
+      <button class="mode-btn active" id="inventory-mode-btn" type="button">盤點模式</button>
+      <button class="mode-btn" id="display-mode-btn" type="button">展示模式</button>
+      <div class="mode-spacer"></div>
+      <button class="btn btn-outline" id="download-csv-btn" type="button" disabled>⬇️ 下載 CSV</button>
+      <button class="btn btn-primary" id="download-png-btn" type="button" disabled>⬇️ 下載 PNG</button>
+    </div>
+
+    <section class="ttm-shell">
+      <div class="ttm-canvas-card" id="three-triangles-map-canvas">
+        <div class="ttm-board ttm-board-inventory" id="inventory-board"></div>
+        <div class="ttm-board ttm-board-display" id="display-board" hidden></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/three-triangles-map.js"></script>
+<script>
+  initNav('three-triangles-map', '../');
+  initThreeTrianglesMap();
+</script>
+</body>
+</html>

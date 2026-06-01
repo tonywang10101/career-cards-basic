@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QTVW5DBYY2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QTVW5DBYY2');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>決策空間工作表 – 生涯諮詢工具</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/decision-space-worksheet.css">
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h2>決策空間工作表</h2>
+      <p>用生涯泡泡整理不同選項的相對重要性與決策空間。</p>
+    </div>
+
+    <div class="mode-bar">
+      <div class="mode-spacer"></div>
+      <button class="btn btn-outline" onclick="resetDecisionSpace()">🔄 清空泡泡</button>
+    </div>
+
+    <section class="dsw-page">
+      <div class="dsw-card">
+
+        <form class="dsw-form-panel" id="dsw-form">
+          <label class="dsw-field">
+            <textarea
+              id="bubble-text"
+              rows="2"
+              maxlength="24"
+              placeholder="例如：父母支持（正向）、害怕未知（負向）、錢（正向）"></textarea>
+          </label>
+
+          <div class="dsw-form-actions">
+            <button type="submit" class="btn btn-primary" id="add-bubble-btn">送出</button>
+            <button type="button" class="btn btn-outline" id="update-bubble-btn" disabled>修改</button>
+            <button type="button" class="btn btn-outline" id="clear-form-btn">清空表單</button>
+          </div>
+        </form>
+
+        <div class="dsw-stage-note">
+          下方方框代表了所有決策空間，在裡面新增小圓圈，大小代表每個選項的相對重要性
+        </div>
+
+        <div class="dsw-stage-scroll">
+          <div class="dsw-stage" id="decision-space-stage">
+            <div class="dsw-stage-inner" id="decision-space-inner">
+              <div class="dsw-empty-state" id="decision-space-empty">
+                <span>選到泡泡後可放大、縮小、刪除，也能直接拖曳移動與調整大小。</span>
+              </div>
+            </div>
+
+            <div class="dsw-bubble-toolbar" id="bubble-toolbar" hidden>
+              <button type="button" class="btn btn-outline" id="enlarge-bubble-btn">放大</button>
+              <button type="button" class="btn btn-outline" id="shrink-bubble-btn">縮小</button>
+              <button type="button" class="btn btn-outline dsw-danger-btn" id="delete-bubble-btn">刪除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/decision-space-worksheet.js"></script>
+<script>
+  initNav('decision-space-worksheet', '../');
+  initDecisionSpaceWorksheet();
+</script>
+</body>
+</html>

@@ -34,9 +34,24 @@ function initNav(activeKey, rootPath = './') {
   if (!sidebar) return;
 
   let html = `
-    <div class="sidebar-logo">
-      <h1>生涯諮詢工具箱</h1>
-      <p>Career Counseling Tools</p>
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="sidebar-brand-text">
+          <h1>生涯諮詢工具箱</h1>
+          <p>Career Counseling Tools</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="sidebar-collapse-btn"
+        id="sidebar-collapse-btn"
+        onclick="toggleSidebarCollapse()"
+        aria-label="收合側邊欄"
+        aria-expanded="true"
+        title="收合側邊欄"
+      >
+        <span class="sidebar-collapse-icon" aria-hidden="true">◀</span>
+      </button>
     </div>
     <nav class="sidebar-nav">`;
 
@@ -46,15 +61,16 @@ function initNav(activeKey, rootPath = './') {
       const href = rootPath + item.href;
       const active = item.key === activeKey ? ' active' : '';
       html += `
-        <a class="nav-item${active}" href="${href}">
+        <a class="nav-item${active}" href="${href}" title="${item.label}">
           <span class="nav-icon">${item.icon}</span>
-          ${item.label}
+          <span class="nav-text">${item.label}</span>
         </a>`;
     });
   });
 
   html += `</nav>`;
   sidebar.innerHTML = html;
+  applySidebarCollapseState();
 }
 
 // ===== HAMBURGER (mobile) =====
@@ -67,6 +83,45 @@ function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebar-overlay').classList.remove('open');
 }
+
+const SIDEBAR_COLLAPSE_KEY = 'career-tools-sidebar-collapsed';
+
+function setSidebarCollapseState(collapsed) {
+  const appShell = document.querySelector('.app-shell');
+  const toggleBtn = document.getElementById('sidebar-collapse-btn');
+  if (!appShell || !toggleBtn) return;
+
+  appShell.classList.toggle('sidebar-collapsed', collapsed);
+  toggleBtn.setAttribute('aria-expanded', String(!collapsed));
+  toggleBtn.setAttribute('aria-label', collapsed ? '展開側邊欄' : '收合側邊欄');
+  toggleBtn.setAttribute('title', collapsed ? '展開側邊欄' : '收合側邊欄');
+
+  const icon = toggleBtn.querySelector('.sidebar-collapse-icon');
+  if (icon) icon.textContent = collapsed ? '▶' : '◀';
+}
+
+function applySidebarCollapseState() {
+  if (window.innerWidth <= 768) {
+    setSidebarCollapseState(false);
+    return;
+  }
+
+  const collapsed = localStorage.getItem(SIDEBAR_COLLAPSE_KEY) === 'true';
+  setSidebarCollapseState(collapsed);
+}
+
+function toggleSidebarCollapse() {
+  if (window.innerWidth <= 768) return;
+
+  const appShell = document.querySelector('.app-shell');
+  if (!appShell) return;
+
+  const collapsed = !appShell.classList.contains('sidebar-collapsed');
+  setSidebarCollapseState(collapsed);
+  localStorage.setItem(SIDEBAR_COLLAPSE_KEY, String(collapsed));
+}
+
+window.addEventListener('resize', applySidebarCollapseState);
 
 // ===== TOAST (shared) =====
 function showToast(msg) {

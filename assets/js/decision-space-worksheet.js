@@ -2,7 +2,7 @@ const DSW_STAGE_WIDTH = 920;
 const DSW_STAGE_HEIGHT_DESKTOP = 600;
 const DSW_STAGE_HEIGHT_MOBILE = 760;
 const DSW_MIN_RADIUS = 54;
-const DSW_MAX_RADIUS = 140;
+const DSW_MAX_RADIUS = 540;
 const DSW_RADIUS_STEP = 12;
 
 let dswBubbles = [];
@@ -382,4 +382,119 @@ function resetDecisionSpace() {
   renderDecisionSpace();
   syncFormWithSelection();
   showToast('已清空決策空間');
+}
+
+function downloadDecisionSpacePng() {
+  const canvas = document.createElement('canvas');
+  const scale = 2;
+  const width = DSW_STAGE_WIDTH;
+  const height = getStageHeight();
+
+  canvas.width = width * scale;
+  canvas.height = height * scale;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    showToast('目前無法產生圖片');
+    return;
+  }
+
+  ctx.scale(scale, scale);
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, height);
+  gradient.addColorStop(0, '#ffffff');
+  gradient.addColorStop(1, '#f9fafb');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+
+  const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 360);
+  glow.addColorStop(0, 'rgba(79, 70, 229, 0.05)');
+  glow.addColorStop(1, 'rgba(79, 70, 229, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.strokeStyle = '#1f2937';
+  ctx.lineWidth = 3;
+  roundRectPath(ctx, 1.5, 1.5, width - 3, height - 3, 24);
+  ctx.stroke();
+
+  dswBubbles.forEach(bubble => drawBubbleToCanvas(ctx, bubble));
+
+  const link = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0, 10);
+  link.href = canvas.toDataURL('image/png');
+  link.download = `decision-space-worksheet-${stamp}.png`;
+  link.click();
+
+  showToast('已下載 PNG');
+}
+
+function drawBubbleToCanvas(ctx, bubble) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.97)';
+  ctx.shadowColor = 'rgba(15, 23, 42, 0.10)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 18;
+  ctx.fill();
+  ctx.restore();
+
+  ctx.beginPath();
+  ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+  ctx.strokeStyle = '#1f2937';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  const fontSize = clamp(bubble.radius * 0.36, 14, 22);
+  const lines = wrapBubbleText(ctx, bubble.text, bubble.radius * 1.45, fontSize);
+  const lineHeight = fontSize * 1.25;
+  const totalHeight = (lines.length - 1) * lineHeight;
+
+  ctx.fillStyle = '#1f2937';
+  ctx.font = `800 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  lines.forEach((line, index) => {
+    const y = bubble.y - totalHeight / 2 + index * lineHeight;
+    ctx.fillText(line, bubble.x, y);
+  });
+}
+
+function wrapBubbleText(ctx, text, maxWidth, fontSize) {
+  ctx.save();
+  ctx.font = `800 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", sans-serif`;
+
+  const chars = Array.from(text);
+  const lines = [];
+  let current = '';
+
+  chars.forEach(char => {
+    const next = current + char;
+    if (current && ctx.measureText(next).width > maxWidth) {
+      lines.push(current);
+      current = char;
+    } else {
+      current = next;
+    }
+  });
+
+  if (current) lines.push(current);
+  ctx.restore();
+  return lines.slice(0, 3);
+}
+
+function roundRectPath(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
 }

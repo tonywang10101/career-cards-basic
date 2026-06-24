@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QTVW5DBYY2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QTVW5DBYY2');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>好時光日記 – 生涯諮詢工具</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/good-time-journal.css">
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h2>好時光日記</h2>
+      <p>記錄一天中的活動，觀察哪些時刻讓你投入、充電，哪些時刻讓你分心或耗竭。</p>
+    </div>
+
+    <div class="mode-bar">
+      <label class="gtj-date-field">
+        <span>日期</span>
+        <input type="date" id="gtj-date">
+      </label>
+      <div class="mode-spacer"></div>
+      <button class="btn btn-primary" type="button" onclick="downloadGoodTimePng()">⬇️ 下載 PNG</button>
+      <button class="btn btn-outline" type="button" onclick="downloadGoodTimePdf()">PDF</button>
+      <button class="btn btn-outline" type="button" onclick="resetGoodTimeJournal()">清空</button>
+    </div>
+
+    <section class="gtj-shell">
+      <div class="gtj-sheet-wrap">
+        <article class="gtj-sheet" id="good-time-journal-sheet">
+          <header class="gtj-sheet-header">
+            <div class="gtj-diary-icon" aria-hidden="true">
+              <span>DIARY</span>
+              <i></i><i></i><i></i>
+            </div>
+            <div>
+              <p class="gtj-kicker">找出自己的路</p>
+              <h1>好時光日記</h1>
+              <p class="gtj-intro">把當天的活動分成「投入/精力充沛」與「無法投入/精疲力竭」來記錄，搭配投入度與能量儀表，找出哪些情境讓你更接近心流。</p>
+            </div>
+            <time class="gtj-display-date" id="gtj-display-date"></time>
+          </header>
+
+          <section class="gtj-board" aria-label="好時光日記工作表">
+            <div class="gtj-column-title is-good">投入 / 精力充沛</div>
+            <div class="gtj-column-title is-bad">無法投入 / 精疲力竭</div>
+            <div class="gtj-row-list" id="gtj-row-list"></div>
+          </section>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/good-time-journal.js"></script>
+<script>
+  initNav('good-time-journal', '../');
+  initGoodTimeJournal();
+</script>
+</body>
+</html>

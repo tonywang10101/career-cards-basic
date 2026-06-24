@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QTVW5DBYY2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QTVW5DBYY2');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>奧德賽計畫 – 生涯諮詢工具</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/odyssey-plan.css">
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h2>奧德賽計畫</h2>
+      <p>為未來五年設計三種人生原型：延續、突破，以及不受金錢與面子限制的創意版本。</p>
+    </div>
+
+    <div class="mode-bar">
+      <div class="odp-tabs" id="odp-tabs"></div>
+      <div class="mode-spacer"></div>
+      <button class="btn btn-primary" type="button" onclick="downloadOdysseyPng()">⬇️ 下載目前 PNG</button>
+      <button class="btn btn-outline" type="button" onclick="downloadOdysseyPdf()">PDF 合併三路</button>
+      <button class="btn btn-outline" type="button" onclick="resetOdysseyPlan()">清空本路</button>
+    </div>
+
+    <section class="odp-shell">
+      <div class="odp-sheet-wrap">
+        <article class="odp-sheet" id="odyssey-plan-sheet">
+          <header class="odp-sheet-header">
+            <label class="odp-plan-name">
+              <span>計畫</span>
+              <input id="odp-plan-title" type="text" maxlength="40" placeholder="輸入這條路的計畫名稱">
+            </label>
+            <div class="odp-brand">
+              <div class="odp-bulb" aria-hidden="true"></div>
+              <div>
+                <p>自己的生命自己設計</p>
+                <h1>奧德賽計畫</h1>
+              </div>
+            </div>
+          </header>
+
+          <section class="odp-route-note" id="odp-route-note"></section>
+
+          <section class="odp-timeline" id="odp-timeline" aria-label="五年時間軸"></section>
+
+          <section class="odp-bottom-panel">
+            <div class="odp-gauge-area">
+              <h3 id="odp-route-summary"></h3>
+              <div class="odp-gauge-grid" id="odp-gauge-grid"></div>
+            </div>
+            <div class="odp-question-area">
+              <div class="odp-question-list" id="odp-question-list"></div>
+            </div>
+          </section>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/odyssey-plan.js"></script>
+<script>
+  initNav('odyssey-plan', '../');
+  initOdysseyPlan();
+</script>
+</body>
+</html>

@@ -1,0 +1,545 @@
+:root {
+  --odp-blue: #2563a8;
+  --odp-blue-dark: #174d8e;
+  --odp-paper: #fffdf8;
+  --odp-line: #1f2937;
+  --odp-soft: #eef2f7;
+  --odp-red: #ef4444;
+  --odp-yellow: #f59e0b;
+  --odp-green: #22c55e;
+}
+
+.odp-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.odp-tab {
+  padding: 8px 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: 999px;
+  background: white;
+  color: var(--gray-600);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.odp-tab:hover,
+.odp-tab.is-active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+}
+
+.odp-shell {
+  display: flex;
+  justify-content: center;
+}
+
+.odp-sheet-wrap {
+  width: 100%;
+  max-width: 100%;
+}
+
+.odp-sheet {
+  width: min(100%, 1120px);
+  aspect-ratio: 1.414 / 1;
+  margin: 0 auto;
+  padding: 26px 34px 30px;
+  background: var(--odp-paper);
+  border-top: 18px solid var(--odp-blue);
+  border-bottom: 18px solid var(--odp-blue);
+  box-shadow: var(--shadow-lg);
+  color: var(--odp-blue-dark);
+}
+
+.odp-sheet-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  padding-bottom: 18px;
+  border-bottom: 3px solid rgba(37, 99, 168, 0.35);
+}
+
+.odp-plan-name {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: 68px;
+  border: 4px solid var(--odp-blue);
+  border-radius: 999px;
+  background: white;
+  overflow: hidden;
+}
+
+.odp-plan-name span {
+  align-self: stretch;
+  min-width: 144px;
+  display: inline-flex;
+  align-items: center;
+  padding-left: 28px;
+  background: #e5e7eb;
+  color: var(--odp-blue-dark);
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.odp-plan-name input {
+  min-width: 0;
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0 22px;
+  color: var(--gray-800);
+  font: inherit;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.odp-brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.odp-brand p {
+  color: var(--odp-blue-dark);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.odp-brand h1 {
+  color: var(--odp-blue-dark);
+  font-size: 38px;
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.odp-bulb {
+  position: relative;
+  width: 74px;
+  height: 74px;
+  border: 4px dashed #1f2937;
+  border-radius: 50%;
+}
+
+.odp-bulb::before {
+  content: "";
+  position: absolute;
+  left: 23px;
+  top: 20px;
+  width: 28px;
+  height: 34px;
+  border-radius: 50% 50% 42% 42%;
+  background: #fde047;
+  border: 4px solid #1f2937;
+}
+
+.odp-bulb::after {
+  content: "";
+  position: absolute;
+  left: 29px;
+  top: 54px;
+  width: 16px;
+  height: 10px;
+  border-radius: 3px;
+  background: #1f2937;
+}
+
+.odp-route-note {
+  margin: 16px 0 30px 0 ;
+  color: #315f93;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.65;
+}
+
+.odp-timeline {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border: 3px solid var(--odp-line);
+  min-height: 426px;
+  background: rgba(255, 255, 255, 0.46);
+}
+
+.odp-year-card {
+  position: relative;
+  min-width: 0;
+  border-right: 3px solid var(--odp-line);
+  padding: 38px 12px 32px;
+}
+
+.odp-year-card:last-child {
+  border-right: none;
+}
+
+.odp-year-label {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  border: 3px solid var(--odp-blue);
+  border-radius: 999px;
+  background: white;
+  overflow: hidden;
+}
+
+.odp-year-label input {
+  width: 80px;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding-left: 16px;
+  color: var(--gray-800);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.odp-year-label span {
+  padding-left: 4px;
+  color: var(--odp-blue-dark);
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.odp-year-card textarea {
+  width: 100%;
+  min-height: 330px;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--gray-800);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.odp-year-card textarea::placeholder,
+.odp-question textarea::placeholder {
+  color: #94a3b8;
+}
+
+.odp-char-count {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.odp-char-count.is-full {
+  color: #b91c1c;
+}
+
+.odp-bottom-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 0.9fr);
+  gap: 34px;
+  margin-top: 24px;
+  align-items: end;
+}
+
+.odp-gauge-area h3 {
+  margin-bottom: 16px;
+  color: var(--odp-blue-dark);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.odp-gauge-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.odp-gauge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.odp-gauge {
+  position: relative;
+  width: 112px;
+  height: 66px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.odp-gauge-face {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 56px;
+  border-radius: 112px 112px 0 0;
+  border: 4px solid #111827;
+  border-bottom: none;
+  overflow: hidden;
+  background:
+    conic-gradient(from 270deg at 50% 100%,
+      var(--odp-red) 0deg 45deg,
+      var(--odp-yellow) 45deg 126deg,
+      var(--odp-green) 126deg 180deg,
+      transparent 180deg 360deg);
+}
+
+.odp-gauge-face::after {
+  content: "";
+  position: absolute;
+  left: 17px;
+  right: 17px;
+  bottom: -2px;
+  height: 40px;
+  border-radius: 80px 80px 0 0;
+  background: var(--odp-paper);
+}
+
+.odp-gauge-needle {
+  position: absolute;
+  left: calc(50% - 2px);
+  bottom: 7px;
+  width: 4px;
+  height: 42px;
+  border-radius: 999px;
+  background: #111827;
+  transform-origin: 50% 100%;
+  transition: transform 0.15s ease;
+}
+
+.odp-gauge-hub {
+  position: absolute;
+  left: calc(50% - 12px);
+  bottom: -3px;
+  width: 24px;
+  height: 24px;
+  border: 4px solid #111827;
+  border-radius: 50%;
+  background: white;
+}
+
+.odp-gauge-scale {
+  display: flex;
+  width: 112px;
+  justify-content: space-between;
+  padding: 0 4px;
+  color: #1f2937;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.odp-gauge-name {
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.odp-question-list {
+  display: grid;
+  gap: 12px;
+}
+
+.odp-question {
+  display: grid;
+  grid-template-columns: 94px minmax(0, 1fr);
+  align-items: end;
+  gap: 0;
+}
+
+.odp-question-label {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #e5e7eb;
+  color: var(--odp-blue-dark);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.odp-question-field {
+  position: relative;
+  min-height: 44px;
+  border-bottom: 3px solid #a78787;
+}
+
+.odp-question textarea {
+  width: 100%;
+  min-height: 42px;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 4px 48px 4px 12px;
+  color: var(--gray-800);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.odp-question .odp-char-count {
+  right: 0;
+  bottom: 3px;
+}
+
+@media (max-width: 1100px) {
+  .odp-sheet {
+    aspect-ratio: auto;
+  }
+
+  .odp-sheet-header {
+    grid-template-columns: 1fr;
+  }
+
+  .odp-brand {
+    justify-content: flex-start;
+  }
+
+  .odp-timeline {
+    min-height: auto;
+  }
+
+  .odp-year-card textarea {
+    min-height: 260px;
+  }
+
+  .odp-bottom-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .mode-bar .mode-spacer {
+    display: none;
+  }
+
+  .mode-bar .btn,
+  .odp-tab {
+    flex: 1 1 150px;
+    justify-content: center;
+  }
+
+  .odp-sheet {
+    padding: 24px 20px 30px;
+    border-top-width: 12px;
+    border-bottom-width: 12px;
+  }
+
+  .odp-plan-name {
+    height: auto;
+    min-height: 62px;
+  }
+
+  .odp-plan-name span {
+    min-width: 104px;
+    padding-left: 20px;
+    font-size: 24px;
+  }
+
+  .odp-plan-name input {
+    font-size: 18px;
+  }
+
+  .odp-brand h1 {
+    font-size: 32px;
+  }
+
+  .odp-brand p {
+    font-size: 15px;
+  }
+
+  .odp-bulb {
+    width: 60px;
+    height: 60px;
+  }
+
+  .odp-bulb::before {
+    left: 18px;
+    top: 15px;
+    width: 24px;
+    height: 30px;
+  }
+
+  .odp-bulb::after {
+    left: 24px;
+    top: 46px;
+  }
+
+  .odp-timeline {
+    grid-template-columns: 1fr;
+    border: none;
+    gap: 28px;
+    background: transparent;
+  }
+
+  .odp-year-card {
+    border: 3px solid var(--odp-line);
+    padding: 38px 16px 32px;
+    background: rgba(255, 255, 255, 0.58);
+  }
+
+  .odp-year-card:last-child {
+    border-right: 3px solid var(--odp-line);
+  }
+
+  .odp-year-label {
+    left: 20px;
+    transform: none;
+  }
+
+  .odp-year-card textarea {
+    min-height: 156px;
+  }
+
+  .odp-gauge-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .odp-question {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .odp-sheet {
+    padding: 22px 14px 28px;
+  }
+
+  .odp-plan-name {
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: 24px;
+  }
+
+  .odp-plan-name span {
+    min-height: 44px;
+    padding-left: 18px;
+  }
+
+  .odp-plan-name input {
+    min-height: 48px;
+  }
+
+  .odp-brand {
+    align-items: flex-start;
+  }
+
+  .odp-gauge-grid {
+    grid-template-columns: 1fr;
+  }
+}

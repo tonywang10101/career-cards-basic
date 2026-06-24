@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QTVW5DBYY2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QTVW5DBYY2');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生命設計健檢 – 生涯諮詢工具</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/life-design-checkup.css">
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h2>生命設計健檢</h2>
+      <p>參考 Stanford Life Design 的健康、工作、遊戲與愛四個儀表，快速定位目前狀態與想調整的地方。</p>
+    </div>
+
+    <div class="mode-bar">
+      <div class="mode-spacer"></div>
+      <button class="btn btn-primary" type="button" onclick="downloadLifeDesignPng()">⬇️ 下載 PNG</button>
+      <button class="btn btn-outline" type="button" onclick="downloadLifeDesignPdf()">PDF</button>
+      <button class="btn btn-outline" type="button" onclick="resetLifeDesignCheckup()">清空</button>
+    </div>
+
+    <section class="ldc-shell">
+      <div class="ldc-sheet-scroll">
+        <article class="ldc-sheet" id="life-design-sheet">
+          <header class="ldc-sheet-header">
+            <div class="ldc-title-mark" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div>
+              <h1>生命設計健檢</h1>
+              <p>先替四個面向打分，再寫下此刻的具體觀察。分數不是成績，而是讓你看見哪裡需要重新設計、哪裡只是暫時需要被接住。</p>
+            </div>
+          </header>
+
+          <section class="ldc-score-panel" aria-label="四個生命面向狀態">
+            <div class="ldc-prompt">
+              <strong>定位現況</strong>
+              <span>盤點以下四個領域的目前狀態。最近的你，還好嗎？</span>
+            </div>
+            <div class="ldc-score-list" id="ldc-score-list"></div>
+          </section>
+
+          <section class="ldc-reflection-grid" id="ldc-reflection-grid"></section>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/life-design-checkup.js"></script>
+<script>
+  initNav('life-design-checkup', '../');
+  initLifeDesignCheckup();
+</script>
+</body>
+</html>

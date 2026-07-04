@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QTVW5DBYY2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QTVW5DBYY2');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>成人依附風格檢測 – 生涯諮詢工具</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/adult-attachment.css">
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h2>成人依附風格檢測</h2>
+      <p>依據 Bartholomew 與 Horowitz 的四類型成人依附觀點，探索自己在親密、自主、信任與接納上的互動傾向。</p>
+    </div>
+
+    <div class="mode-bar">
+      <div class="mode-spacer"></div>
+      <button class="btn btn-outline" id="attachment-pdf-btn" type="button" onclick="downloadAdultAttachmentPdf()" disabled>下載 PDF</button>
+      <button class="btn btn-outline" type="button" onclick="resetAdultAttachment()">清空</button>
+      <button class="btn btn-primary" type="button" onclick="submitAdultAttachment()">生成報告</button>
+    </div>
+
+    <section class="attachment-layout">
+      <article class="attachment-panel attachment-questions" aria-labelledby="attachment-question-title">
+        <div class="attachment-panel-header">
+          <span class="attachment-kicker">Questions</span>
+          <h3 id="attachment-question-title">題目區</h3>
+          <p>請依照你在重要關係中的一般狀態作答。沒有標準答案，越貼近目前的自己越好。</p>
+        </div>
+        <div class="attachment-scale-head" aria-hidden="true">
+          <span></span>
+          <span>非常不符合</span>
+          <span>不符合</span>
+          <span>有點不符合</span>
+          <span>有點符合</span>
+          <span>符合</span>
+          <span>非常符合</span>
+        </div>
+        <form id="attachment-form" class="attachment-form"></form>
+      </article>
+
+      <aside class="attachment-results" aria-label="成人依附結果">
+        <article class="attachment-panel">
+          <div class="attachment-panel-header">
+            <span class="attachment-kicker">Quadrants</span>
+            <h3>結果四個象限</h3>
+            <p>四個分數以 0-50 呈現；越外圈代表該依附傾向越明顯。</p>
+          </div>
+          <div class="attachment-chart-wrap">
+            <svg id="attachment-chart" class="attachment-chart" viewBox="0 0 420 420" role="img" aria-label="成人依附四象限菱形圖"></svg>
+          </div>
+          <div class="attachment-score-grid" id="attachment-score-grid"></div>
+        </article>
+
+        <article class="attachment-panel attachment-report" aria-labelledby="attachment-report-title">
+          <div class="attachment-panel-header">
+            <span class="attachment-kicker">Report</span>
+            <h3 id="attachment-report-title">報告描述</h3>
+          </div>
+          <div id="attachment-report-body" class="attachment-report-body">
+            <p>完成 24 題後，這裡會整理你的主要依附傾向、四類型分數與可思考的關係線索。</p>
+            <p class="attachment-note">量表分數的解釋偏向教育性質，而非臨床診斷。我們希望問卷的這些解釋可以幫助你對自己有更多的認識；若有疑問，請諮詢相關專業人員。</p>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/adult-attachment.js"></script>
+<script>
+  initNav('adult-attachment', '../');
+  initAdultAttachment();
+</script>
+</body>
+</html>

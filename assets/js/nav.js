@@ -23,6 +23,7 @@ const NAV_ITEMS = [
       { key: 'value-navigation',    icon: '💎', label: '價值導航卡',               href: 'value-navigation/index.html' },
       { key: 'life-balance',        icon: '⚖️', label: '生命平衡輪',               href: 'life-balance/index.html' },
       { key: 'life-design-checkup', icon: '🧭', label: '生命設計健檢',             href: 'life-design-checkup/index.html' },
+      { key: 'adult-attachment',    icon: '◇', label: '成人依附風格檢測',         href: 'adult-attachment/index.html' },
       { key: 'good-time-journal',   icon: '📓', label: '好時光日記',               href: 'good-time-journal/index.html' },
       { key: 'odyssey-plan',        icon: '💡', label: '奧德賽計畫',               href: 'odyssey-plan/index.html' },
       { key: 'decision-space-worksheet', icon: '🫧', label: '決策空間工作表',      href: 'decision-space-worksheet/index.html' },

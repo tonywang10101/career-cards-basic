@@ -316,7 +316,7 @@ const INVENTORY_CARDS = [
     consequence2:"過度保護", adjustment2:"逐步放手設計難度曲線，讓他人逐步獨立",
     fitRole:"領導者、人資、導師、講師、教練", fitTask:"團隊建立、接班人計劃、新人培訓", fitGeneral:"提升團隊總戰力，解放主管時間",
     improveSteps:["1. 學習情境領導，因材施教", "2. 練習 GROW 教練模型 (Goal, Reality, Options , Will)"] },
-  { id:44, category:"People & Leadership", title:"國際合作",
+  { id:44, category:"People & Leadership", title:"團隊合作",
     descLines:["主動分享資訊與資源、避免各自為政", "願意補位，而非本位主義", "能為整體目標讓步與支援", "會照顧團隊節奏與氛圍"],
     shadow1:"害怕衝突，不敢建言", shadow2:"避免承擔主要責任",
     consequence1:"團隊表面和諧但績效低落", adjustment1:"面對並解決問題",
